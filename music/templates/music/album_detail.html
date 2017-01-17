@@ -169,9 +169,10 @@
 // handle songlist-play-btn
     $('i.songlist-play-btn').on('click', function(){
         var pos = document.URL.indexOf('/album/'),
-            album_id = document.URL.slice(pos+7, -1),
+            pos_last = document.URL.indexOf('/', pos+7),
+            album_id = document.URL.slice(pos+7, pos_last),
             url = "{% url 'playqueue:album_exchange' "00000" %}".replace('00000', album_id);
-
+        console.log(album_id);
         $.ajax({
             type: "GET",
             url: url,

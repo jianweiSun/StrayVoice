@@ -23,7 +23,11 @@
         <i class="fa fa-close fa-1x div-center"></i>
     </div>
     <div class="right in-line-55 like-wrapper">
-        <i class="fa fa-heart-o fa-15x div-center"></i>
+        {% if song in request.user.like_songs.all %}
+            <i class="fa fa-heart fa-1x div-center red">&nbsp;{{ song.total_likes }}</i>
+        {% else %}
+            <i class="fa fa-heart-o fa-1x div-center">&nbsp;{{ song.total_likes }}</i>
+        {% endif %}
     </div>
 </li>
 {% endfor %}

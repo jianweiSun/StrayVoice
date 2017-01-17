@@ -21,7 +21,7 @@
                     {% endif %}
                 </div>
                 <div class="inline-middle" style="font-size: 1.5em; margin-left: 15px;">
-                    <a>
+                    <a href="{% url 'userpage:front_page' song.user.username %}">
                     {{ song.user.profile.nickname }}
                     </a>
                 </div>
@@ -126,7 +126,8 @@
 // handle page-play-btn
     $('i.page-play-btn').on('click', function(){
         var pos = document.URL.indexOf('/songs/'),
-            song_id = document.URL.slice(pos+7, -1),
+            pos_last = document.URL.indexOf('/', pos+7),
+            song_id = document.URL.slice(pos+7, pos_last),
             url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
 
         $.ajax({
@@ -146,7 +147,8 @@
         var $this = $(this),
             like_num = parseInt($this.text()),
             pos = document.URL.indexOf('/songs/'),
-            id = document.URL.slice(pos+7, -1),
+            pos_last = document.URL.indexOf('/', pos+7),
+            id = document.URL.slice(pos+7, pos_last),
             action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
 
         $.ajax({

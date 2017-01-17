@@ -822,6 +822,10 @@ ul#playing-data-wrapper li {
     width: 100%;
 }
 
+div.like-wrapper i.red{
+    color: red;
+}
+
 /*******  song detail *************/
 
 div.side-bar {
@@ -996,3 +1000,4 @@ div.song-box {
 div.btns i.red{
     color: red;
 }
+

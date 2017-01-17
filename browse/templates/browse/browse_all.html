@@ -82,7 +82,11 @@
                         </a>
                     </div>
                     <div class="btns left">
-                        <i class="fa fa-heart-o fa-1x" style="margin-right: 10px;"></i>
+                        {% if song in request.user.like_songs.all %}
+                            <i class="song-like-btn fa fa-heart fa-1x red" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
+                        {% else %}
+                            <i class="song-like-btn fa fa-heart-o fa-1x" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
+                        {% endif %}
                         <i class="fa fa-plus fa-1x">新增</i>
                     </div>
                 </div>
@@ -118,7 +122,6 @@
 
         songs.each(function(index, item){
             var song_id = $(this).data('id');
-            console.log(typeof song_id);
             tmp_array.push(song_id);
         });
 
@@ -128,10 +131,43 @@
             dataType: "html",
             data: {ids_list: JSON.stringify(tmp_array)},
             success : function(data, status, jqXHR){
-                console.log(status);
-                console.log(jqXHR);
                 $(data).prependTo(audioplayer.playQueue.empty());
                 audioplayer.forwardButton.trigger('click');
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+// song-like-btn
+    $('i.song-like-btn').on('click', function(){
+        var $this = $(this),
+            like_num = parseInt($this.text()),
+            song_id = $(this).closest('div.song-box').data('id'),
+            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'music:song_like' %}",
+            data: {
+                'song_id': song_id,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (content_type != "application/json" ) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    if (action == 'like') {
+                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
+                                                       .text(' ' + (like_num+1));
+                    }
+                    else {
+                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
+                                                       .text(' ' + (like_num-1));
+                    }
+                }
             },
             error: function(){ alert('錯誤') }
         });

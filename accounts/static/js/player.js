@@ -297,3 +297,7 @@ AudioPlayer.prototype.queueClearButtonSet = function() {
 }
 
 var audioplayer = new AudioPlayer($('#player-wrapper'));
+
+audioplayer.container.find('#icon-wrapper').on('click', 'a', function(e){
+    e.preventDefault();
+})
