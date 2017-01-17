@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+
+{% block title %}{{ user.profile.nickname }}｜Strayvoice {% endblock %}
+
+{% block content %}
+<div id="container" class="gray">
+    <div id="content-container">
+        <div class="profile_row">
+            <div id="profile" class="wrapper left">
+                {% if user.frontpagecontent.head_portrait %}
+                    {% thumbnail user.frontpagecontent.head_portrait "340x340" crop="center" as im %}
+                    <img src="{{ im.url }}" width="{{ im.width }}" height="im.height">
+                    {% endthumbnail %}
+                {% else %}
+                    <img src="{% static 'img/default_head_portrait_big.jpeg' %}" width="340px" height="340px">
+                {% endif %}
+                {% if request.user == user %}
+                <form action="" method="post" enctype="multipart/form-data">
+                    <ul class="message">
+                        <li class="success">選擇檔案更換頭像</li>
+                    </ul>
+                    {% for field in form %}
+                    {% if field.errors %}
+                        {{ field.errors }}
+                    {% else %}
+                        <ul class="errorlist"></ul>
+                    {% endif %}
+                    <p> {{ field }} </p>
+                    {% endfor %}
+                    {% csrf_token %}
+                </form>
+                {% endif %}
+            </div>
+            <div id="profile-right">
+                <div class="profile-right-small">
+                    <h1>{{ user.profile.nickname }}</h1>
+                </div>
+                <div class="profile-right-small"></div>
+                <div class="profile-right-small"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block domready %}
+    $('#container').css('background-color', '#eee');
+    $('#profile').hover(function() {
+        $(this).find('form').fadeIn(100);
+    }, function() {
+        $(this).find('form').fadeOut(100);
+    });
+    $('#id_head_portrait').on('change', function() {
+        $(this).parents('form').submit();
+    });
+{% endblock %}

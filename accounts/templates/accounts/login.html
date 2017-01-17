@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}登入｜Strayvoice {% endblock %}
+
+{% block content %}
+<div id="container">
+    <div id="login-box" class="right">
+        <div id="logo"><p>Strayvoice</p></div>
+        <ul class="messages">
+            {% if messages %}
+            {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+            </li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+        <p>請輸入你的帳號與密碼</p>
+        <form action="" method="post">
+            <p>{{ form.username }}</p>
+            <p>{{ form.password }}</p>
+            {% csrf_token %}
+            <p><button type="submit">登入</button></p>
+        </form>
+        <a href="{% url 'register' %}" class="btn btn-fullwidth">建立 Strayvoice ID</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block domready %}
+    $('input#id_username').attr('placeholder', 'Strayvoice 帳號 / 電子郵件');
+    $('input#id_password').attr('placeholder', '密碼');
+{% endblock %}

@@ -1,0 +1,221 @@
+{% load static %}
+{% load thumbnail %}
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>{% block title %}{% endblock %}</title>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+</head>
+
+<body>
+<div id="nav-container">
+	<div id="nav">
+		<div id="logo"><a href="{% url 'userpage:tmp_homepage' %}">Strayvoice</a></div>
+		<ul class="left">
+			<li><a href="{% url 'userpage:tmp_homepage' %}">首頁</a></li>
+			<li><a href="#">排行榜</a></li>
+			<li><a href="#">歌單</a></li>
+			<li><a href="{% url 'browse:browse_all' 'all' 'latest' %}">音樂瀏覽</a></li>
+			<li><a href="#">徵選</a></li>
+		</ul>
+		<ul class="right">
+			<li><a href="{% url 'music:song_create' %}" class="btn">發佈音樂</a></li>
+			<li>
+				<a href="#">
+					<i class="fa fa-search fa-2x" aria-hidden="true"></i>
+				</a>
+			</li>
+			<li>
+				<a id="player-handle" href="#">
+					<i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i>
+				</a>
+			</li>
+            {% if request.user.is_authenticated %}
+                {% if not request.user.frontpagecontent.head_portrait %}
+                    <img id="user-icon" src="{% static 'img/default_head_portrait.jpeg' %}">
+                {% else %}
+                {% thumbnail request.user.frontpagecontent.head_portrait "55x55" crop="center" as im %}
+                    <img id="user-icon" src="{{ im.url }}" width="{{ im.width }}" height="im.height">
+                {% endthumbnail %}
+                {% endif %}
+            {% else %}
+                <li>
+                    <a href="{% url 'login' %}" class="btn">登入</a>
+                </li>
+            {% endif %}
+		</ul>
+	</div>
+</div>
+
+{% if request.user.is_authenticated %}
+<ul class="dropdown-menu">
+    <li>
+       <a href="{% url 'userpage:front_page' request.user.username %}">我的首頁</a>
+    </li>
+    <li>
+       <a href="#">通知</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+       <a href="{% url 'music:un_album_songs' %}">管理音樂</a>
+    </li>
+    <li>
+       <a href="#">管理歌單</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+       <a href="{% url 'profile_edit' %}">設定</a>
+    </li>
+    <li>
+       <a href="{% url 'logout' %}">登出</a>
+    </li>
+</ul>
+{% endif %}
+
+<div id='player-wrapper'>
+    <audio>
+        <source src="https://streams.streetvoice.cn/music/FU/HE/FUHEYU/45a7732e63334793a9f795e5ec1d92cb.mp3?e=1483268872&token=JNyZUKZZQ7xxV-mUm4x4cQSNoEaFZ6dNss8OyB5X:8QaHp2BxBOJgOud_wwec13FGT-8=" type="audio/mpeg">
+    </audio>
+    <div id='bar-wrapper'>
+        <div id="progress-bar"></div>
+        <div id="buffered-bar"></div>
+    </div>
+    <div id='content-wrapper'>
+        <ul id="playing-data-wrapper">
+        </ul>
+        <div id='icon-wrapper'>
+            <div id='icon'>
+                <input id="volume-control" type="range" min="0" max="100" value="50" orient="vertical">
+                <a href="#">
+                    <i id='volume-button' class="fa fa-volume-up" aria-hidden="true"></i>
+                </a>
+                <a href="#">
+                    <i id='backward-button' class="fa fa-backward" aria-hidden="true"></i>
+                </a>
+                <a href="#">
+                    <i id='play-button' class="fa fa-play fa-2x" aria-hidden="true"></i>
+                </a>
+                <a href="#">
+                    <i id='forward-button' class="fa fa-forward" aria-hidden="true"></i>
+                </a>
+                <a href="#">
+                    <i id='repeat-button' class="fa fa-rotate-left" aria-hidden="true"></i>
+                </a>
+                <a href="#">
+                    <i id='list-button' class="fa fa-list-ul" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+        <div id="duration">
+            <span id="current-time">00:00</span> / <span id="full-duration">00:00</span>
+        </div>
+    </div>
+    <div id="play-queue-wrapper">
+        <div class="list-header">
+            <h3>播放佇列</h3>
+            <div class="right">
+                <span style="display: none">清空佇列</span>
+                <i class="fa fa-trash-o fa-2x"></i>
+            </div>
+        </div>
+        <hr>
+        <ul id="play-queue">
+            {% for song in play_queue %}
+            <li data-id="{{ song.id }}" data-src="{{ song.file.url }}">
+                <div class="small-song-icon" style="height: 55px; width: 55px;">
+                        {% if not song.cover %}
+                            <img src="{% static 'img/no_image_photo_40X40.png' %}" height="45px" width="45px">
+                        {% else %}
+                        {% thumbnail song.cover "55x55" crop="center" as im %}
+                            <img src="{{ im.url }}" height="45px" width="45px">
+                        {% endthumbnail %}
+                        {% endif %}
+                    <i class="queue-play-btn play-song fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
+                </div>
+                <div class="in-line-55">
+                    <a href="{{ song.get_absolute_url }}">{{ song.name }}</a>
+                    <a href="{% url 'userpage:front_page' song.user.username %}">{{ song.user.profile.nickname }}</a>
+                </div>
+                <div class="close-wrapper">
+                    <i class="fa fa-close fa-1x div-center"></i>
+                </div>
+                <div class="right in-line-55 like-wrapper">
+                    <i class="fa fa-heart-o fa-15x div-center"></i>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
+{% block content %}
+{% endblock %}
+
+<div id="footer">
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="{% static 'js/player.js' %}"></script>
+<script>
+
+    $(document).ready(function(){
+
+        $('img#user-icon').on('click', function(e){
+            var $playerWrapper = $('#player-wrapper'),
+                $playQueueWrapper = $playerWrapper.find('div#play-queue-wrapper');
+
+            if (!$playerWrapper .is(':hidden')) {
+                if (!$playQueueWrapper.is(':hidden')) {
+                    $playQueueWrapper.slideUp('200').promise().done(WrapperUp);
+                    function WrapperUp() {
+                        $playerWrapper .slideUp('200');
+                    }
+                }
+                else {
+                    $playerWrapper.slideUp('300');
+                }
+            }
+            $('ul.dropdown-menu').toggle();
+            e.preventDefault();
+        });
+
+        $('a#player-handle').on('click', function(e){
+            if (!$('ul.dropdown-menu').is('hidden')) {
+                $('ul.dropdown-menu').hide();
+            }
+            $('#player-wrapper').slideToggle('300');
+            e.preventDefault();
+        });
+
+        $('i#list-button').on('click', function(){
+            $('div#play-queue-wrapper').slideToggle('300');
+        });
+
+        // play-queue hover effect
+        $('ul#play-queue').on('mouseenter', "li", function(){
+            var $this = $(this);
+            $this.find('i.play-song').show();
+            $this.find('div.close-wrapper').show();
+        }).on('mouseleave', "li", function(){
+            var $this = $(this);
+            $this.find('i.play-song').hide();
+            $this.find('div.close-wrapper').hide();
+        });
+
+        // trash-can effect
+        $('div.list-header i.fa-trash-o').hover(function(){
+            $(this).siblings().toggle();
+        });
+
+
+        {% block domready %}
+
+        {% endblock %}
+    });
+
+</script>
+</body>
+</html>

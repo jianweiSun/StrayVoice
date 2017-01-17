@@ -1,0 +1,62 @@
+{% extends "music/manage/manage_base.html" %}
+{% load static %}
+{% load music_tags %}
+
+{% block title %}新增專輯｜Strayvoice {% endblock %}
+
+{% block nav_head %}
+    <ul id="nav-head">
+        <li>
+            <a href="{% url 'music:un_album_songs' %}">管理音樂</a>
+        </li>
+        <li class="unactive">
+            &nbsp;&nbsp;新增專輯
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+{% show_albums_bar all_albums %}
+<div class="row-right-75">
+    <form action="" method="post" enctype="multipart/form-data">
+        <div id="album-cover">
+            <img id='img-preview' width="250px" height="250px" src="{% static 'img/no_image_photo.png' %}">
+            <label for="{{ form.cover.id_for_label }}" class="button-like">上傳專輯封面</label>
+            {{ form.cover }}
+            {{ form.cover.errors }}
+        </div>
+        <div id="album-data">
+            {{ form.name.errors }}
+            <div class="form-input">{{ form.name }}</div>
+            <div class="form-input">{{  form.description }}</div>
+            <p>
+                <button type="submit">儲存並上傳專輯</button>
+            </p>
+        </div>
+        {% csrf_token %}
+    </form>
+</div>
+{% endblock %}
+
+{% block domready %}
+    $('#id_name').attr('placeholder', '請輸入專輯名稱');
+    $('#id_description').attr('placeholder', '請輸入專輯介紹文字');
+
+    // img preview
+    var readURL = function(input) {
+        if (input.files[0]) {
+            var reader = new FileReader(),
+                file = input.files[0];
+
+            reader.onload = function() {
+                $('#img-preview').attr('src', reader.result);
+            }
+
+            reader.readAsDataURL(file);
+        }
+    };
+
+    $('#id_cover').on('change', function(){
+        readURL(this);
+    });
+{% endblock %}

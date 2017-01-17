@@ -1,0 +1,114 @@
+{% extends "music/manage/manage_base.html" %}
+{% load static %}
+{% load music_tags %}
+{% load thumbnail %}
+
+{% block title %}新增專輯｜Strayvoice {% endblock %}
+
+{% block nav_head %}
+    <ul id="nav-head">
+        <li>
+            <a href="{% url 'music:un_album_songs' %}">管理音樂</a>
+        </li>
+        <li class="unactive">
+            &nbsp;&nbsp;未分類歌曲
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+{% show_albums_bar all_albums album %}
+<div class="row-right-75">
+    <table>
+        <thead>
+            <tr>
+                <td class="wid50">歌曲名稱</td>
+                <td class="wid10">長度</td>
+                <td class="wid20">發佈時間</td>
+                <td class="wid10">編輯</td>
+                <td class="wid10">移至</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for song in songs %}
+            <tr class="song-row" data-id="{{ song.id }}">
+                <td>
+                    <div class="small-song-icon">
+                        {% if not song.cover %}
+                            <img src="{% static 'img/no_image_photo_40X40.png' %}" height="40px" width="40px">
+                        {% else %}
+                        {% thumbnail song.cover "40x40" crop="center" as im %}
+                            <img src="{{ im.url }}" height="40px" width="40px">
+                        {% endthumbnail %}
+                        {% endif %}
+                        <i class="play-song fa fa-play-circle-o fa-2x" aria-hidden="true"></i>
+                    </div>
+                    <a href="{{ song.get_absolute_url }}">
+                        {{ song.name }}
+                    </a>
+                </td>
+                <td>{{ song.length }}</td>
+                <td>{{ song.created|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'music:song_edit' song.id %}" class="btn">
+                        編輯
+                    </a>
+                </td>
+                <td>
+                    <a id="song_change_album" href="{% url 'music:song_change_album' song.id %}" class="btn">
+                        移至
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block domready %}
+    // table hover effect
+    $('tbody>tr').hover(function(){
+        $(this).css('background-color', '#e3e3e3')
+               .find('i.play-song').show();
+    }, function(){
+            $(this).css('background-color', 'white')
+                   .find('i.play-song').hide();
+    });
+
+    // deal with song_change_album
+        $('a#song_change_album').on('click', function(e){
+            var url = $(this).attr('href'),
+                $body = $('body');
+            e.preventDefault();
+            $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
+            $('<div></div>', { 'id': 'fixed-center' })
+                            .load(url, popOutActivate).prependTo($body);
+
+            function popOutActivate() {
+                var popOutDiv = $(this),
+                    popOutCover = $(this).next('#popout-black-cover'),
+                    cancelButton = $(this).find('button[type=button]');
+                cancelButton.on('click', function(){
+                    popOutDiv.remove();
+                    popOutCover.remove();
+                });
+            };
+        });
+
+    // active play-song button
+    $('tr.song-row').find('i.play-song').on('click', function(){
+        var song_id = $(this).closest('tr.song-row').data('id'),
+            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "html",
+            success : function(data){
+                $(data).prependTo($('ul#play-queue'))
+                       .find('i.queue-play-btn').trigger('click');
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+{% endblock %}

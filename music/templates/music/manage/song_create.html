@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}上傳歌曲｜Strayvoice {% endblock %}
+
+{% block content %}
+<div id="container" class="gray">
+    <div id="content-container-85">
+        <div class="menu">
+            <ul>
+                <li class="selected">
+                    <a href="{% url 'music:song_create' %}">發佈音樂</a>
+                </li>
+                <li>
+                    <a href="{% url 'music:un_album_songs' %}">管理音樂</a>
+                </li>
+                <li>
+                    <a href="#">管理歌單</a>
+                </li>
+            </ul>
+        </div>
+        <div class="row">
+            <form action="" method="post" enctype="multipart/form-data">
+                <div id="song-cover">
+                    <img id='img-preview' width="250px" height="250px" src="{% static 'img/no_image_photo.png' %}">
+                    <label for="{{ form.cover.id_for_label }}" class="button-like">上傳歌曲封面</label>
+                    {{ form.cover }}
+                    {{ form.cover.errors }}
+                </div>
+                <div id="song-data">
+                    <div>上傳/更新音檔：{{ form.file }}</div>
+                    {{ form.file.errors }}
+                    <div id="tags" class="menu">
+                            <ul>
+                                <li class="selected">
+                                    <a href="#" data-id="song-info">資訊</a>
+                                </li>
+                                <li>
+                                    <a href="#" data-id="lyrics">歌詞</a>
+                                </li>
+                            </ul>
+                    </div>
+                    <div>
+                        <div id="song-info">
+                            <div class="form-input">{{ form.name }}</div>
+                            <div class="form-input">{{ form.description }}</div>
+                            <div class="form-input-half">{{ form.album }}</div>
+                            <div class="form-input-half">{{ form.genre }}</div>
+                            <div class="form-input-half">{{ form.authorization }}</div>
+                            <div class="form-input-half">{{ form.published }}</div>
+                        </div>
+                        <div id="lyrics" style="display: none">{{ form.lyrics }}</div>
+                    </div>
+                    <p>
+                        <button type="submit">上傳歌曲</button>
+                    </p>
+                </div>
+                {% csrf_token %}
+                {{ form.length }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block domready %}
+    $('#id_name').attr('placeholder', '歌曲名稱/顯示名稱');
+    $('#id_description').attr('placeholder', '輸入介紹文字')
+                        .attr('rows', '5');
+    $('#id_lyrics').attr('placeholder', '請填入歌詞');
+    $('div#tags a').on('click', function(e){
+        var $this = $(this),
+            id = $(this).data('id');
+        $(this).parent('li').addClass('selected')
+               .siblings().removeClass('selected');
+        $('div#' + id).show().siblings().hide();
+        e.preventDefault();
+    });
+
+// img preview
+    var previewIMG = function(input) {
+        if (input.files[0]) {
+            var reader = new FileReader(),
+                file = input.files[0];
+
+            reader.readAsDataURL(file);
+
+            reader.onload = function() {
+                $('#img-preview').attr('src', reader.result);
+            }
+        }
+    };
+
+    $('#id_cover').on('change', function(){
+        previewIMG(this);
+    });
+
+// read song_length
+    var fetchSongLength = function(input) {
+        if (input.files[0]) {
+            if (input.files[0].type != 'audio/mp3'){
+                alert("請上傳mp3檔案");
+                // reset it
+                $(input).wrap('<form id="tmp"></form>').closest('form#tmp').get(0).reset();
+                $(input).unwrap('form#tmp');
+            }
+            else {
+                var reader = new FileReader(),
+                    file = input.files[0];
+
+                reader.readAsDataURL(file);
+
+                reader.onload = function() {
+                    var audio = new Audio();
+                    audio.src = reader.result;
+
+                    audio.addEventListener('loadedmetadata', function(){
+                    var duration = audio.duration,
+                        minutes = Math.floor(duration / 60),
+                        seconds = Math.round(duration % 60),
+                        pad = function(num) {
+                            return (num < 10) ? '0' + num.toString() : num.toString();
+                        };
+                        $('input#id_length').val(pad(minutes) + ':' + pad(seconds));
+                        $('button[type="submit"]').prop('disabled', false);
+                    });
+                }
+            }
+        };
+    };
+
+    $('#id_file').on('change', function(){
+        fetchSongLength(this);
+        $('button[type="submit"]').prop('disabled', true);
+    });
+{% endblock %}

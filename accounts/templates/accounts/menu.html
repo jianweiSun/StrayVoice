@@ -1,0 +1,16 @@
+<div class="menu">
+    <ul>
+        <li {% if section == 'profile_edit' %} class="selected" {% endif %}>
+            <a href="{% url 'profile_edit' %}">會員資訊</a>
+        </li>
+        <li {% if section == 'email_edit' %} class="selected" {% endif %}>
+            <a href="{% url 'email_edit' %}">變更電子郵件地址</a>
+        </li>
+        <li {% if section == 'password_edit' %} class="selected" {% endif %}>
+            <a href="{% url 'password_edit' %}">變更密碼</a>
+        </li>
+        <li {% if section == 'account_delete' %} class="selected" {% endif %}>
+            <a href="{% url 'account_delete' %}">刪除帳號</a>
+        </li>
+    </ul>
+</div>

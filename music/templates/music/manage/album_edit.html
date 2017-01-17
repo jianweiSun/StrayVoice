@@ -1,0 +1,221 @@
+{% extends "music/manage/manage_base.html" %}
+{% load static %}
+{% load music_tags %}
+{% load thumbnail %}
+
+{% block title %}編輯專輯｜Strayvoice {% endblock %}
+
+{% block nav_head %}
+    <ul id="nav-head">
+        <li>
+            <a href="{% url 'music:un_album_songs' %}">管理音樂</a>
+        </li>
+        <li class="unactive">
+            &nbsp;&nbsp;{{ album.name }}
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+{% show_albums_bar all_albums album %}
+<div class="row-right-75">
+    <form action="" method="post" enctype="multipart/form-data">
+        <div id="album-cover">
+            <img id='img-preview' width="250px" height="250px"
+                 src="{% if album.cover %}
+                      {% thumbnail album.cover '250x250' crop='center' as im %}
+                            {{ im.url }}
+                      {% endthumbnail %}
+                      {% else %}
+                            {% static 'img/no_image_photo.png' %}
+                      {% endif %}">
+            <label for="{{ form.cover.id_for_label }}" class="button-like">更換專輯封面</label>
+            <div style="display: none;">{{ form.cover }}</div>
+            <h4 id='apply-covers' style="text-align: center; color: #ff595f; cursor: pointer">套用專輯封面至所有歌曲</h4>
+            {{ form.cover.errors }}
+        </div>
+        <div id="album-data">
+            {{ form.name.errors }}
+            <div class="form-input">{{ form.name }}</div>
+            <div class="form-input">{{  form.description }}</div>
+            <p style="text-align: right;">
+                <a href="{% url 'music:album_delete' album.id %}">
+                    <button type="button" class="wid20">刪除專輯</button>
+                </a>
+                <button class="wid20" type="submit">更新專輯</button>
+            </p>
+        </div>
+        {% csrf_token %}
+    </form>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <td class="wid5"></td>
+                <td class="wid45">歌曲名稱</td>
+                <td class="wid10">長度</td>
+                <td class="wid20">發佈時間</td>
+                <td class="wid10">編輯</td>
+                <td class="wid10">移至</td>
+            </tr>
+        </thead>
+        <tbody id="sort-table">
+            {% for song in songs %}
+            <tr class='song-row' data-id="{{ song.id }}" data-order="{{ song.order }}">
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <div class="small-song-icon">
+                        {% if not song.cover %}
+                            <img src="{% static 'img/no_image_photo_40X40.png' %}" height="40px" width="40px">
+                        {% else %}
+                        {% thumbnail song.cover "40x40" crop="center" as im %}
+                            <img src="{{ im.url }}" height="40px" width="40px">
+                        {% endthumbnail %}
+                        {% endif %}
+                        <i class="play-song fa fa-play-circle-o fa-2x" aria-hidden="true"></i>
+                    </div>
+                    <a href="{{ song.get_absolute_url }}">
+                        {{ song.name }}
+                    </a>
+                </td>
+                <td>{{ song.length }}</td>
+                <td>{{ song.created|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'music:song_edit' song.id %}" class="btn">
+                        編輯
+                    </a>
+                </td>
+                <td>
+                    <a id="song_change_album" href="{% url 'music:song_change_album' song.id %}" class="btn">
+                        移至
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+{% endblock %}
+
+{% block domready %}
+    $('#id_name').attr('placeholder', '請輸入專輯名稱');
+    $('#id_description').attr('placeholder', '請輸入專輯介紹文字');
+
+// img preview
+    var readURL = function(input) {
+        if (input.files[0]) {
+            var reader = new FileReader(),
+                file = input.files[0];
+
+            reader.onload = function() {
+                $('#img-preview').attr('src', reader.result);
+            }
+
+            reader.readAsDataURL(file);
+        }
+    };
+
+    $('#id_cover').on('change', function(){
+        readURL(this);
+    });
+// table hover-effect
+    $('tbody>tr').hover(function(){
+        $(this).css('background-color', '#e3e3e3')
+               .find('i.play-song').show();
+    }, function(){
+            $(this).css('background-color', 'white')
+                   .find('i.play-song').hide();
+    });
+
+// deal with song_change_album
+    $('a#song_change_album').on('click', function(e){
+        var url = $(this).attr('href'),
+            $body = $('body');
+        e.preventDefault();
+        $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
+        $('<div></div>', { 'id': 'fixed-center' })
+                        .load(url, popOutActivate).prependTo($body);
+
+        function popOutActivate() {
+            var popOutDiv = $(this),
+                popOutCover = $(this).next('#popout-black-cover'),
+                cancelButton = $(this).find('button[type=button]');
+            cancelButton.on('click', function(){
+                popOutDiv.remove();
+                popOutCover.remove();
+            });
+        };
+    });
+
+// re-order the songs
+    $('tbody#sort-table').sortable({
+        stop: function(event, ui) {
+            var $this = $(this),
+                song_objects = {};
+
+            // update data-order and insert into song_objects
+            $this.children().each(function(index, item){
+                $(item).data('order', index+1);
+                song_objects[$(item).data('id')] = index + 1;
+            });
+
+            // disable sortable until ajax success
+            $this.sortable("disable");
+
+            $.ajax({
+                type: 'POST',
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                url: "{% url 'music:album_songs_order' %}",
+                contentType: 'application/json; charset=UTF-8;',
+                dataType: 'json',
+                data: JSON.stringify(song_objects),
+                success: function(data){
+                    $this.children().each(function(index, item){
+                        $(item).find('td').first().html(index+1);
+                    });
+                    $this.sortable("enable");
+                },
+                error: function(){ alert('錯誤') }
+            });
+        }
+    });
+
+// active play-song button
+    $('tr.song-row').find('i.play-song').on('click', function(){
+        var song_id = $(this).closest('tr.song-row').data('id'),
+            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "html",
+            success : function(data){
+                $(data).prependTo($('ul#play-queue'))
+                       .find('i.queue-play-btn').trigger('click');
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+// apply album cover to all songs
+    $('#apply-covers').on('click', function(){
+        var pos = document.URL.indexOf('/album/'),
+            id = document.URL.slice(pos+7, -1);
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'music:album_apply_covers' %}",
+            data: {album_id: id},
+            success : function(data){
+                $(data).find('table').prependTo($('table').empty());
+            },
+            error: function(){ alert('錯誤') }
+        });
+
+    });
+
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load music_tags %}
+
+{% block title %}
+    {{ album.name }} - {{ album.user.profile.nickname }} | StrayVoice
+{% endblock %}
+
+{% block content %}
+<div id="container">
+    <div class="side-bar">
+            <div class="row-no-color">
+                <div class="inline-middle">
+                    {% if not album.user.frontpagecontent.head_portrait %}
+                        <img class="round" src="{% static 'img/default_head_portrait_big.jpeg' %}" height="80px" width="80px">
+                    {% else %}
+                    {% thumbnail album.user.frontpagecontent.head_portrait "80x80" crop="center" as im %}
+                        <img class="round" src="{{ im.url }}" width="{{ im.width }}" height="im.height">
+                    {% endthumbnail %}
+                    {% endif %}
+                </div>
+                <div class="inline-middle" style="font-size: 1.5em; margin-left: 15px;">
+                    {{ album.user.profile.nickname }}
+                </div>
+            </div>
+            <div class="row-no-color">
+                <button type="button">追蹤</button>
+            </div>
+            <hr style="border-color: #7b7b7b">
+            <div class="row-no-color">
+                <div>喜歡</div>
+                <h1 style="color: #ff595f">0</h1>
+            </div>
+    </div>
+    <div class="content-container-left">
+        <div style="overflow: auto;">
+            <div class="wid25 left">
+                <div class="cover-playbtn">
+                    {% if not album.cover %}
+                        <img src="{% static 'img/no_image_photo.png' %}" height="175px" width="175px">
+                    {% else %}
+                    {% thumbnail album.cover "175x175" crop="center" as im %}
+                        <img src="{{ im.url }}" height="175px" width="175px">
+                    {% endthumbnail %}
+                    {% endif %}
+                        <i class="songlist-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="wid75 left">
+                <h1>{{ album.name }}</h1>
+                <div class="btns">
+                    <i class="fa fa-heart-o fa-15x" style="margin-right: 20px;"></i>
+                    <i class="fa fa-plus fa-15x">新增</i>
+                </div>
+                <table class="no-border">
+                    <tr>
+                        <th>曲目</th>
+                        <td>{{ album.songs.count }}</td>
+                    </tr>
+                    <tr>
+                        <th>發佈</th>
+                        <td>
+                            {{ album.created|date:"Y 年 m 月 d 日" }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div>
+            <div class="inline-middle">
+                <i class="songlist-play-btn fa fa-play-circle fa-4x big-play-btn"></i>
+            </div>
+            <div class="inline-middle" style="color: #ff595f; font-size: 1.5em; margin-left: 10px;">播放</div>
+        </div>
+        <div id="tags" class="menu">
+            <ul>
+                <li class="selected">
+                    <a href="#" data-tag="songs">曲目</a>
+                </li>
+                <li>
+                    <a href="#" data-tag="description">介紹</a>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <div data-tag="songs">
+                <table>
+                    <thead>
+                        <tr>
+                            <td class="wid5"></td>
+                            <td class="wid65">歌曲名稱</td>
+                            <td class="wid10">長度</td>
+                            <td class="wid20">發佈時間</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for song in album.songs.all %}
+                        <tr class='song-row' data-id="{{ song.id }}" data-order="{{ song.order }}">
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <div class="small-song-icon">
+                                    {% if not song.cover %}
+                                        <img src="{% static 'img/no_image_photo_40X40.png' %}" height="40px" width="40px">
+                                    {% else %}
+                                    {% thumbnail song.cover "40x40" crop="center" as im %}
+                                        <img src="{{ im.url }}" height="40px" width="40px">
+                                    {% endthumbnail %}
+                                    {% endif %}
+                                    <i class="play-song fa fa-play-circle-o fa-2x" aria-hidden="true"></i>
+                                </div>
+                                <a href="{{ song.get_absolute_url }}">
+                                    {{ song.name }}
+                                </a>
+                            </td>
+                            <td>{{ song.length }}</td>
+                            <td>{{ song.created|date:"Y-m-d" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div data-tag="description" style="display: none;">
+                {{ album.description|linebreaks }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block domready %}
+
+// tag click
+    $('div#tags a').on('click', function(e){
+        var $this = $(this),
+            tag = $(this).data('tag');
+        $(this).parent('li').addClass('selected')
+               .siblings().removeClass('selected');
+        $('div[data-tag=' + tag + ']').show().siblings().hide();
+        e.preventDefault();
+    });
+
+// table hover-effect
+    $('tbody>tr').hover(function(){
+        $(this).css('background-color', '#e3e3e3')
+               .find('i.play-song').show();
+    }, function(){
+            $(this).css('background-color', 'white')
+                   .find('i.play-song').hide();
+    });
+
+// active play-song button
+    $('tr.song-row').find('i.play-song').on('click', function(){
+        var song_id = $(this).closest('tr.song-row').data('id'),
+            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "html",
+            success : function(data){
+                $(data).prependTo($('ul#play-queue'))
+                       .find('i.queue-play-btn').trigger('click');
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+// handle songlist-play-btn
+    $('i.songlist-play-btn').on('click', function(){
+        var pos = document.URL.indexOf('/album/'),
+            album_id = document.URL.slice(pos+7, -1),
+            url = "{% url 'playqueue:album_exchange' "00000" %}".replace('00000', album_id);
+
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "html",
+            success : function(data){
+                $(data).prependTo(audioplayer.playQueue.empty());
+                audioplayer.forwardButton.trigger('click');
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+{% endblock %}

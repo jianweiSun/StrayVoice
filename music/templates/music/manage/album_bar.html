@@ -1,0 +1,17 @@
+<div class="row-left-25">
+    <a href="{% url 'music:album_create' %}">
+        <button>新增專輯</button>
+    </a>
+    <ul class="vertical">
+        <li {% if album.name == '未分類專輯' %}class="selected"{% endif %}>
+            <a href="{% url 'music:un_album_songs'%}">
+                未分類歌曲
+            </a>
+        </li>
+        {% for album_item in all_albums %}
+            <li {% if album_item.name == album.name %}class="selected"{% endif %}>
+                <a href="{% url 'music:album_edit' album_item.id %}">{{ album_item.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

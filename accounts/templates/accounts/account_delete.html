@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load accounts_tags %}
+
+{% block title %}刪除帳號｜Strayvoice {% endblock %}
+
+{% block content %}
+<div id="container" class="gray">
+    <div id="content-container">
+        {% show_menu section %}
+        <div class="inputform">
+            <h2>您確定要刪除您的帳號嗎？</h2>
+            <ul class="messages">
+                {% if messages %}
+                {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                </li>
+                {% endfor %}
+                {% endif %}
+            </ul>
+            <form action="" method="post">
+                {% for field in form %}
+                <p>{{ field.label_tag }}</p>
+                <p> {{ field }} </p>
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% else %}
+                    <ul class="errorlist"></ul>
+                {% endif %}
+                {% endfor %}
+                {% csrf_token %}
+                <p>
+                    <button type="submit">刪除帳號</button>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

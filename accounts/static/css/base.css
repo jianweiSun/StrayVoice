@@ -1,0 +1,998 @@
+body {
+	margin: 0px;
+	padding-top: 60px;
+}
+
+div#nav-container {
+    background-color: white;
+	position: fixed;
+	top: 0px;
+	height: 60px;
+	width: 100%;
+	border-bottom: 1.5px solid #e3e3e3;
+	z-index: 100;
+}
+
+div#nav {
+	height: inherit;
+	width: 85%;
+	margin-left: 7.5%;
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
+a {
+	text-decoration: none;
+}
+
+ul {
+	margin: auto;
+	padding-left: 0px;
+	height: inherit;
+	list-style-type: none;
+}
+
+ul>li {
+	display: inline-block;
+}
+
+ul>li>a {
+/*	display: block;
+	padding: 22px 15px;*/
+	line-height: 60px;
+	padding: 20px 15px;
+	color: #5b5b5b;
+}
+
+ul>li>a:hover, ul li.selected>a {
+	color: red;
+}
+
+ul>li>a>i {
+    vertical-align: middle;
+}
+
+div#nav ul>img {
+    vertical-align: middle;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+}
+
+div#nav ul>img {
+    vertical-align: middle;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+}
+
+div#nav ul>img:hover {
+    border: 2px solid red;
+    cursor: pointer;
+}
+
+
+#logo {
+	float: left;
+	height: inherit;
+	font-size: 2em;
+}
+
+#logo>a {
+/*	display: block;
+	padding: 13.5px 15px;*/
+	line-height: 60px;
+	padding: 0px 15px;
+	font-family: Arial, serif;
+	font-style: italic;
+	font-weight: 900;
+	color: #2b2b2b;
+}
+
+.btn {
+	color: red;
+	padding: 10px 8px;
+	border: 1px red solid;
+	border-radius: 5px;
+}
+.btn:hover {
+	color: white;
+	background-color: red;
+}
+
+ul.nav-right>li>a>i {
+	position: relative;
+	top: 5px;
+}
+
+#container {
+    position: relative;
+    overflow: auto;
+    padding: 60px 0px;
+}
+.gray {
+    background-color: #eee;
+}
+
+
+div#login-box {
+    border: 1px solid #e3e3e3;
+    padding: 20px 50px;
+    margin-right: 100px;
+}
+
+div#login-box p {;
+    clear: both;
+}
+
+div#login-box div#logo p {
+    margin: 20px 20px 0px 20px;
+    font-size: 1.5em;
+	padding: 0px 0px;
+	font-family: Arial, serif;
+	font-style: italic;
+	font-weight: 900;
+	color: #2b2b2b;
+}
+
+div#login-box form p label {
+    display: none;
+}
+
+input {
+    width: 100%;
+    height: 30px;
+    font-size:15px;
+    box-sizing: border-box;
+}
+
+
+button {
+    width: 100%;
+    height: 30px;
+    font-size: 15px;
+    color: red;
+    background-color: white;
+    border: 1px red solid;
+    border-radius: 5px;
+    padding: 0;
+}
+
+button:hover {
+    color: white;
+    background-color: red;
+    cursor: pointer;
+}
+
+button[type="button"] {
+    color: #5b5b5b;
+    border-color: #5b5b5b;
+}
+
+button[type="button"]:hover {
+    color: white;
+    background-color: #5b5b5b;
+}
+
+.btn-fullwidth {
+    text-align: center;
+    display: block;
+    width: inherit;
+}
+
+ul.messages {
+    width: 100%;
+    height: 36px;
+    clear: both;
+}
+
+ul.messages li {
+    display:list-item;
+}
+
+.error {
+    color: white;
+    padding: 10px 20px;
+    background-color: #ff7171;
+    border-radius: 5px;
+}
+
+.success {
+    color: white;
+    padding: 10px 20px;
+    background-color: #57de5b;
+    border-radius: 5px;
+}
+
+div.inputform {
+    /*width: 50%;
+    padding: 50px 150px;*/
+    margin: auto;
+    padding: 50px 150px;
+    background-color: white;
+}
+
+div.inputform p {
+    margin: 0px;
+    padding: 5px;
+}
+
+div.inputform button {
+    height: 50px;
+    margin: 20px 0px;
+}
+
+ul.errorlist {
+    color: red;
+    height: 20px;
+    padding-left: 5px;
+}
+
+div.inputform h1 {
+    margin: 0px 0px 30px 0px;
+}
+ul.dropdown-menu {
+    display: none;
+    position:fixed;
+    top: 60px;
+    right: 7.5%;
+    width: 150px;
+    background-color:white;
+    border: 1px solid #e3e3e3;
+    z-index: 1;
+}
+
+
+ul.dropdown-menu li {
+    display: block;
+    margin: 10px 0px;
+}
+
+ul.dropdown-menu li a {
+    display: block;
+    padding: 5px 20px;
+    line-height: 20px;
+}
+
+ul.dropdown-menu li.divider {
+    height: 1px;
+    border-bottom: 1px solid #e3e3e3;
+}
+
+p.input-like {
+    font-size: 15px;
+    height:30px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+div#content-container {
+    width: 75%;
+    margin: auto;
+}
+
+div.menu {
+    border-bottom: 2px solid #bbbbbb;
+    margin-bottom: 20px;
+}
+
+div.menu ul li:hover, div.menu ul li.selected {
+    border-bottom: 2px solid red;
+    margin-bottom: -2px;
+}
+
+.row {
+    overflow: auto;
+    background-color: white;
+    padding: 25px;
+    margin-top: 50px;
+}
+
+.row-pad-0-25 {
+    overflow: auto;
+    background-color: white;
+    padding: 0px 25px;
+    margin-top: 50px;
+}
+}
+
+.wrapper {
+    position:relative;
+}
+
+div.profile_row {
+    overflow: auto;
+    background-color: white;
+}
+div#profile {
+    width: 340px;
+}
+
+div#profile form {
+    background-color: white;
+    opacity: 0.8;
+    position: absolute;
+    bottom: 0px;
+    display: none;
+}
+
+div#profile form p, div#profile form ul {
+    margin: 0px;
+    padding: 0px;
+}
+
+div#profile-right {
+    width: 640px;
+    float:left;
+}
+
+div.profile-right-small {
+    padding: 20px 30px;
+    box-sizing: border-box;
+    height: 113px;
+}
+
+
+div#song-cover {
+    width: 25%;
+    float: left;
+    padding: 0px 22px 0px 0px;
+    box-sizing: border-box;
+}
+
+div#song-data {
+    width: 75%;
+    float: left;
+    position: relative;
+}
+
+div#content-container-85 {
+    width:85%;
+    margin:auto;
+}
+
+input#id_cover {
+    position: absolute;
+    top: -1000px;
+}
+
+label.button-like {
+    padding: 10px 10px;
+    margin:auto;
+    margin-top: 10px;
+    width: 150px;
+    text-align: center;
+    display: block;
+    border: 2px solid #5b5b5b;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #5b5b5b;
+}
+
+label.button-like:hover, label.button-like:active {
+    color: white;
+    background-color: #5b5b5b;
+}
+
+input#id_file {
+    width: 50%;
+}
+
+div.form-input {
+    margin-bottom: 15px;
+}
+
+div.form-input-half {
+    padding: 0px;
+    margin-left: 5px;
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 49%;
+}
+textarea {
+    width: 100%;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+textarea#id_lyrics {
+    height: 200px;
+    margin: 14px 0px;
+}
+select {
+    width: 100%;
+}
+
+/* ---------------   audioplayer   --------------- */
+div#player-wrapper {
+    position: fixed;
+    top:60px;
+    margin: 0px;
+    height: 60px;
+    width: 100%;
+    border-bottom: 1px solid #e3e3e3;
+    display: none;
+    background-color: white;
+    z-index: 100;
+}
+
+div#bar-wrapper {
+    width: 100%;
+    position: relative;
+    background-color: #e3e3e3;
+    height: 5px;
+    z-index: -1;
+    cursor: pointer;
+}
+
+div#progress-handle {
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    background-color: white;
+    border:1px solid #e3e3e3;
+    z-index: 5;
+}
+
+div#progress-bar {
+    position: absolute;
+    background-color: #ff6868;
+    border-top:1px solid #e3e3e3;
+    border-bottom: 1px solid #e3e3e3;
+    height: 3px;
+    z-index: 1;
+}
+
+div#buffered-bar {
+    position: absolute;
+    background-color: #bbbbbb;
+    border-top:1px solid #e3e3e3;
+    border-bottom: 1px solid #e3e3e3;
+    height: 3px;
+    z-index: 0;
+}
+
+div#content-wrapper {
+    position: relative;
+    height: 55px;
+    width: 85%;
+    margin: auto;
+}
+div#icon-wrapper {
+    float: right;
+}
+div#icon {
+    display: table-cell;
+    vertical-align: middle;
+    height: 55px;
+}
+
+div#icon i {
+    vertical-align: middle;
+    display: inline;
+    height: 55px;
+    color: #959595;
+    padding: 5px 8px;
+    margin: 0px 3px;
+    box-sizing: border-box;
+    border: 2px solid #e3e3e3;
+    border-radius: 30%;
+    cursor: pointer;
+}
+
+div#icon i:hover {
+    background-color: #959595;
+    color: white;
+}
+
+div#duration {
+    height: inherit;
+    float: right;
+    text-align: center;
+    color: #959595;
+    margin-right: 20px;
+}
+
+div#duration span {
+    line-height: 55px;
+}
+
+input#volume-control {
+    position: fixed;
+    top: 110px;
+    width: 36px;
+    height: 100px;
+    background-color: red;
+    display: none;
+    writing-mode: bt-lr;
+    -webkit-appearance: slider-vertical;
+    z-index: 100;
+}
+
+/* -------------------------------------------------- */
+
+div#footer {
+    background-color: #3a3a3a;
+    padding: 40px 0px;
+    border-top: 2px solid red;
+}
+
+div.row-left-25 {
+    float: left;
+    width: 25%;
+    box-sizing: border-box;
+    padding-right: 30px;
+}
+
+div.row-right-75 {
+    float: left;
+    width: 75%;
+    box-sizing: border-box;
+    border-left: 1px solid #e3e3e3;
+    padding-left: 30px;
+}
+
+div#album-cover {
+    width: 35%;
+    float: left;
+    padding: 0px 22px 0px 0px;
+    box-sizing: border-box;
+}
+
+div#album-data {
+    width: 65%;
+    float: left;
+    box-sizing: border-box;
+}
+
+img#img-preview {
+    display: block;
+    margin: auto;
+}
+
+select {
+    font-size: 14px;
+}
+
+ul.vertical>li {
+    display:list-item;
+    height: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    color: #5b5b5b;
+}
+
+tbody tr {
+    border-top: 1px solid gray;
+}
+
+td {
+    padding: 10px;
+}
+
+
+.wid75 {
+    width: 75%;
+}
+.wid65 {
+    width: 65%;
+}
+.wid50 {
+    width: 50%;
+}
+.wid45 {
+    width: 45%;
+}
+.wid40 {
+    width: 40%;
+}
+.wid30 {
+    width: 30%;
+}
+.wid20 {
+    width: 20%;
+}
+.wid25 {
+    width: 25%;
+}
+.wid10 {
+    width: 10%;
+}
+.wid5 {
+    width: 5%;
+}
+
+div.small-song-icon {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    margin-right: 10px;
+}
+
+i.play-song {
+    position: absolute;
+    display: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    cursor: pointer;
+}
+
+i.play-song:hover {
+    color: red;
+}
+
+li.unactive {
+    color: #a1a1a1;
+}
+
+ul#nav-head li::before {
+    content: '/';
+}
+
+hr {
+    margin:30px 5px;
+    border: 0;
+    border-top: 1px solid #e3e3e3;
+}
+
+form {
+    overflow: auto;
+}
+
+div#top-right {
+    position: absolute;
+    top: 5px;
+    right: 15px;
+}
+
+div#popout-black-cover {
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+    background-color: black;
+    opacity: 0.6;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+div#fixed-center {
+    position: fixed;
+    width: 20%;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    z-index: 2000;
+}
+
+/* ------------ play queue -------------  */
+div#play-queue-wrapper {
+    position: fixed;
+    top: 121px;
+    right: 0px;
+    bottom: 0px;
+    background-color: #eee;
+    width: 400px;
+    border-left: 1px solid #c5c5c5;
+    display: none;
+    overflow: auto;
+}
+
+.list-header {
+    padding: 10px 37px;
+    color: red;
+}
+
+.list-header h3 {
+    display: inline-block;
+    margin: 0px;
+    line-height: 60px;
+}
+
+.list-header div {
+    line-height: 60px;
+}
+
+.list-header i {
+    cursor: pointer;
+    color: #5b5b5b;
+    vertical-align: middle;
+}
+
+.list-header i:hover {
+    color: #2b2b2b;
+}
+
+div#play-queue-wrapper hr {
+    margin: 0px;
+    border: 1px solid #d2d2d2;
+}
+
+div#play-queue-wrapper h3 {
+    font-weight: 500;
+}
+
+ul#play-queue {
+    overflow: auto;
+    color: #5b5b5b;
+}
+
+ul#play-queue li {
+    position: relative;
+    padding: 10px 30px;
+    width: 100%;
+    height: 77px;
+    display: block;
+    box-sizing: border-box;
+    background-color: #e3e3e3;
+    border-top: 1px solid #d2d2d2;
+    border-bottom: 1px solid #d2d2d2;
+}
+
+ul#play-queue li.active {
+    background-color: #d2d2d2;
+}
+
+div.in-line-55 {
+    height: 55px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+ul#play-queue img, ul#playing-data-wrapper img {
+    margin: 5px;
+}
+ul#play-queue a, ul#playing-data-wrapper a {
+    display: block;
+    padding: 6px 0px;
+    color: #5b5b5b;
+}
+
+ul#play-queue a:hover, ul#playing-data-wrapper a:hover{
+    color: red;
+}
+
+.fa-15x{
+    font-size: 1.5em;
+}
+
+i.div-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+
+div.like-wrapper {
+    position: relative;
+    width: 40px;
+}
+
+div.close-wrapper {
+    position: absolute;
+    top: 3px;
+    right: 15px;
+    overflow: auto;
+    width: 15px;
+    height: 15px;
+    display: none;
+}
+
+i.queue-playing {
+    color: #ff595f;
+}
+
+i.queue-playing:hover {
+    color: red;
+}
+
+ul#playing-data-wrapper {
+    height: inherit;
+    min-width: 25%;
+    position: relative;
+    overflow: auto;
+    float: left;
+    list-style-type: none;
+}
+
+ul#playing-data-wrapper li {
+    width: 100%;
+}
+
+/*******  song detail *************/
+
+div.side-bar {
+    position: absolute;
+    top: 0px;
+    right: 7.5%;
+    bottom: 0px;
+    width: 25%;
+    background-color: #e3e3e3;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+div.content-container-left {
+    color: #2b2b2b;
+    width: 60%;
+    margin-left: 7.5%;
+    overflow: auto;
+    padding-right: 50px;
+    box-sizing: border-box;
+}
+
+.content-container-left h1 {
+    margin-top: 0px;
+}
+
+.content-container-left hr {
+    width: 100%;
+    margin: 50px 0px;
+    border: 1px solid #e3e3e3;
+}
+
+div.cover-playbtn {
+    position: relative;
+    float: left;
+}
+
+i.play-song-br {
+    position: absolute;
+    bottom: 3%;
+    right: 4%;
+    color: white;
+    cursor: pointer;
+}
+
+i.play-song-br:hover {
+    color: red;
+}
+
+div.btns {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+div.btns i, a {
+    color: #5b5b5b;
+    cursor: pointer;
+}
+
+div.btns i:hover, a:hover {
+    color: red;
+}
+
+table.no-border tr{
+    border: none;
+    font-size:18px;
+}
+
+table.no-border th {
+    padding: 5px;
+    width: 8%;
+    text-align: left;
+}
+
+table.no-border td {
+    padding: 5px;
+    color: #5b5b5b;
+}
+
+div.row-no-color {
+    box-sizing: border-box;
+    width: 100%;
+    overflow: auto;
+    margin-top: 30px;
+    display: block;
+}
+
+div.inline-middle {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.round {
+    border-radius: 50%;
+}
+
+i.big-play-btn {
+    cursor: pointer;
+    color: #ff595f;
+}
+
+i.big-play-btn:hover {
+    color: red;
+}
+
+div.filter {
+    padding-top: 15px;
+    padding-left: 30px;
+}
+
+/* ---------- filter -----------  */
+
+div.filter-title {
+    color: #8b8b8b;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 20px;
+}
+
+ul.filter-content {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+ul.filter-content a {
+    padding: 7px 10px;
+    line-height: normal;
+    display: block;
+}
+
+ul.filter-content a:hover {
+    background-color: #e3e3e3;
+}
+
+ul.filter-content li.selected {
+    border: 1px solid red;
+    border-radius: 5px;
+}
+
+.margin-t30-b20 {
+    margin: 30px 0px 20px 0px;
+}
+
+/* ------ song-box --------*/
+
+div.song-box {
+    width: 16.66%;
+    float: left;
+    margin-bottom: 30px;
+}
+/* copy from SV */
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.song-box-title {
+    font-size: 18px;
+    margin: 5px 0px;
+}
+
+.song-box-title a {
+    color: black;
+}
+
+.song-box-title a:hover {
+    color: red;
+}
+
+/*  song-like-btn   */
+
+div.btns i.red{
+    color: red;
+}

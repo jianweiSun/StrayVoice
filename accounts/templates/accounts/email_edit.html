@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load accounts_tags %}
+
+{% block title %}變更電子郵件地址｜Strayvoice {% endblock %}
+
+{% block content %}
+<div id="container" class="gray">
+    <div id="content-container">
+        {% show_menu section %}
+        <div class="inputform">
+            <h2>變更電子郵件地址</h2>
+            <ul class="messages">
+                {% if messages %}
+                {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                </li>
+                {% endfor %}
+                {% endif %}
+            </ul>
+            <p>電子郵件地址</p>
+            <p class="input-like">{{ request.user.email }}</p>
+            <ul class="errorlist"></ul>
+            <form action="" method="post">
+                {% for field in form %}
+                <p>{{ field.label_tag }}</p>
+                <p> {{ field }} </p>
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% else %}
+                    <ul class="errorlist"></ul>
+                {% endif %}
+                {% endfor %}
+                {% csrf_token %}
+                <p>
+                    <button type="submit">儲存變更</button>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

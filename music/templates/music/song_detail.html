@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load music_tags %}
+
+{% block title %}
+    {{ song.name }} - {{ song.user.profile.nickname }} | StrayVoice
+{% endblock %}
+
+{% block content %}
+<div id="container">
+    <div class="side-bar">
+            <div class="row-no-color">
+                <div class="inline-middle">
+                    {% if not song.user.frontpagecontent.head_portrait %}
+                        <img class="round" src="{% static 'img/default_head_portrait_big.jpeg' %}" height="80px" width="80px">
+                    {% else %}
+                    {% thumbnail song.user.frontpagecontent.head_portrait "80x80" crop="center" as im %}
+                        <img class="round" src="{{ im.url }}" width="{{ im.width }}" height="im.height">
+                    {% endthumbnail %}
+                    {% endif %}
+                </div>
+                <div class="inline-middle" style="font-size: 1.5em; margin-left: 15px;">
+                    <a>
+                    {{ song.user.profile.nickname }}
+                    </a>
+                </div>
+            </div>
+            <div class="row-no-color">
+                <button type="button">追蹤</button>
+            </div>
+            <hr style="border-color: #7b7b7b">
+            <div class="row-no-color">
+                <div>喜歡</div>
+                <h1 style="color: #ff595f">0</h1>
+            </div>
+    </div>
+    <div class="content-container-left">
+        <div style="overflow: auto;">
+            <div class="wid25 left">
+                <div class="cover-playbtn">
+                    {% if not song.cover %}
+                        <img src="{% static 'img/no_image_photo.png' %}" height="175px" width="175px">
+                    {% else %}
+                    {% thumbnail song.cover "175x175" crop="center" as im %}
+                        <img src="{{ im.url }}" height="175px" width="175px">
+                    {% endthumbnail %}
+                    {% endif %}
+                        <i class="page-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="wid75 left">
+                <h1>{{ song.name }}</h1>
+                <div class="btns">
+                    {% if song in request.user.like_songs.all %}
+                        <i class="song-like-btn fa fa-heart fa-15x red" style="margin-right: 20px;">&nbsp;{{ song.total_likes }}</i>
+                    {% else %}
+                        <i class="song-like-btn fa fa-heart-o fa-15x" style="margin-right: 20px;">&nbsp;{{ song.total_likes }}</i>
+                    {% endif %}
+                    <i class="fa fa-plus fa-15x">新增</i>
+                </div>
+                <table class="no-border">
+                    <tr>
+                        {% if not song.album.name == '未分類專輯' %}
+                        <th>專輯</th>
+                        <td>
+                            <a href="{{ song.album.get_absolute_url }}">
+                                {{ song.album.name }}
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th>分類</th>
+                        <td>{% get_genre_name song.genre %}</td>
+                    </tr>
+                    <tr>
+                        <th>發佈</th>
+                        <td>
+                            {{ song.created|date:"Y 年 m 月 d 日" }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div>
+            <div class="inline-middle">
+                <i class="page-play-btn fa fa-play-circle fa-4x big-play-btn"></i>
+            </div>
+            <div class="inline-middle" style="color: #ff595f; font-size: 1.5em; margin-left: 10px;">播放</div>
+        </div>
+        <div id="tags" class="menu">
+            <ul>
+                <li class="selected">
+                    <a href="#" data-tag="lyrics">歌詞</a>
+                </li>
+                <li>
+                    <a href="#" data-tag="description">介紹</a>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <div data-tag="lyrics">
+                {{ song.lyrics|linebreaks }}
+            </div>
+            <div data-tag="description" style="display: none;">
+                {{ song.description|linebreaks }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block domready %}
+
+// tag click
+    $('div#tags a').on('click', function(e){
+        var $this = $(this),
+            tag = $(this).data('tag');
+        $(this).parent('li').addClass('selected')
+               .siblings().removeClass('selected');
+        $('div[data-tag=' + tag + ']').show().siblings().hide();
+        e.preventDefault();
+    });
+// handle page-play-btn
+    $('i.page-play-btn').on('click', function(){
+        var pos = document.URL.indexOf('/songs/'),
+            song_id = document.URL.slice(pos+7, -1),
+            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
+
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "html",
+            success : function(data){
+                $(data).prependTo(audioplayer.playQueue)
+                       .find('i.queue-play-btn').trigger('click');
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+// song-like-btn
+    $('i.song-like-btn').on('click', function(){
+        var $this = $(this),
+            like_num = parseInt($this.text()),
+            pos = document.URL.indexOf('/songs/'),
+            id = document.URL.slice(pos+7, -1),
+            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'music:song_like' %}",
+            data: {
+                song_id: id,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (content_type != "application/json" ) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    if (action == 'like') {
+                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
+                                                       .text(' ' + (like_num+1));
+                    }
+                    else {
+                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
+                                                       .text(' ' + (like_num-1));
+                    }
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+{% endblock %}
