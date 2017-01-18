@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^(?P<username>\w+)/album/(?P<album_id>\d+)/',
         views.AlbumDetailView.as_view(), name='album_detail'),
     url(r'^song_like/$', views.SongLikeView.as_view(), name='song_like'),
+    url(r'^album_like/$', views.AlbumLikeView.as_view(), name='album_like'),
 ]
 

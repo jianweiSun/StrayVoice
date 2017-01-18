@@ -10,6 +10,8 @@ class Album(models.Model):
     description = models.TextField(max_length=500, blank=True)
     cover = models.ImageField(upload_to='images/album_cover/%Y/%m/%d', blank=True)
     created = models.DateField(auto_now_add=True, db_index=True)
+    liked_by = models.ManyToManyField(User, through='AlbumLikeShip', related_name='like_albums')
+    total_likes = models.IntegerField(default=0)
 
     class Meta:
         ordering = ('-created', )
@@ -96,3 +98,13 @@ class SongLikeShip(models.Model):
         unique_together = ("user", "song")
 
 
+class AlbumLikeShip(models.Model):
+    user = models.ForeignKey(User)
+    album = models.ForeignKey(Album)
+    created = models.DateField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return '{} likes {}'.format(self.user, self.album)
+
+    class Meta:
+        unique_together = ("user", "album")

@@ -4,9 +4,9 @@ from django.views.generic import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import SongCreateForm, AlbumCreateForm, SongChangeAlbumForm
 from django.contrib import messages
-from .models import Album, Song, SongLikeShip
+from .models import Album, Song, SongLikeShip, AlbumLikeShip
 from django.urls import reverse
-from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from playqueue.decorators import ajax_required
@@ -308,3 +308,22 @@ class SongLikeView(LoginRequiredMixin, View):
         return JsonResponse({'saved': 'OK'})
 
 
+class AlbumLikeView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        album_id = request.POST.get('album_id')
+        action = request.POST.get('action')
+
+        album = get_object_or_404(Album, id=album_id)
+        if album.name == '未分類專輯':
+            return HttpResponseNotFound()
+
+        if action == 'like':
+            AlbumLikeShip.objects.create(user=request.user, album=album)
+            album.total_likes = album.liked_by.count()
+            album.save()
+        else:
+            AlbumLikeShip.objects.filter(user=request.user, album=album).delete()
+            album.total_likes = album.liked_by.count()
+            album.save()
+        return JsonResponse({'saved': 'OK'})

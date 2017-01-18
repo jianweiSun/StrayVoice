@@ -21,7 +21,9 @@
                     {% endif %}
                 </div>
                 <div class="inline-middle" style="font-size: 1.5em; margin-left: 15px;">
-                    {{ album.user.profile.nickname }}
+                    <a href="{% url 'userpage:front_page' album.user.username %}">
+                        {{ album.user.profile.nickname }}
+                    </a>
                 </div>
             </div>
             <div class="row-no-color">
@@ -30,7 +32,7 @@
             <hr style="border-color: #7b7b7b">
             <div class="row-no-color">
                 <div>喜歡</div>
-                <h1 style="color: #ff595f">0</h1>
+                <h1 style="color: #ff595f">{{ album.total_likes }}</h1>
             </div>
     </div>
     <div class="content-container-left">
@@ -50,7 +52,11 @@
             <div class="wid75 left">
                 <h1>{{ album.name }}</h1>
                 <div class="btns">
-                    <i class="fa fa-heart-o fa-15x" style="margin-right: 20px;"></i>
+                    {% if album in request.user.like_albums.all %}
+                        <i class="album-like-btn fa fa-heart fa-15x red" style="margin-right: 20px;">&nbsp;{{ album.total_likes }}</i>
+                    {% else %}
+                        <i class="album-like-btn fa fa-heart-o fa-15x" style="margin-right: 20px;">&nbsp;{{ album.total_likes }}</i>
+                    {% endif %}
                     <i class="fa fa-plus fa-15x">新增</i>
                 </div>
                 <table class="no-border">
@@ -180,6 +186,43 @@
             success : function(data){
                 $(data).prependTo(audioplayer.playQueue.empty());
                 audioplayer.forwardButton.trigger('click');
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+// album-like-btn
+    $('i.album-like-btn').on('click', function(){
+        var $this = $(this),
+            like_num = parseInt($this.text()),
+            pos = document.URL.indexOf('/album/'),
+            pos_last = document.URL.indexOf('/', pos+7),
+            album_id = document.URL.slice(pos+7, pos_last),
+            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'music:album_like' %}",
+            data: {
+                'album_id': album_id,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (content_type != "application/json" ) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    if (action == 'like') {
+                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
+                                                       .text(' ' + (like_num+1));
+                    }
+                    else {
+                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
+                                                       .text(' ' + (like_num-1));
+                    }
+                }
             },
             error: function(){ alert('錯誤') }
         });
