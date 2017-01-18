@@ -4,7 +4,7 @@
 {% load music_tags %}
 
 {% block title %}
-    {% get_genre_name genre %} - 所有音樂 | StrayVoice
+    {% get_genre_name genre %} - 我的喜歡 | StrayVoice
 {% endblock %}
 
 {% block content %}
@@ -12,11 +12,15 @@
     <div id="content-container-85">
         <div class="menu">
             <ul>
-                <li class="selected">
-                    <a href="{% url 'browse:browse_all' genre order_type %}">所有音樂</a>
-                </li>
                 <li>
-                    <a href="{% url 'browse:browse_like' genre order_type%}">我的喜歡</a>
+                    {% if order_type == 'recent_liked' %}
+                        <a href="{% url 'browse:browse_all' genre 'latest' %}">所有音樂</a>
+                    {% else %}
+                        <a href="{% url 'browse:browse_all' genre order_type %}">所有音樂</a>
+                    {% endif %}
+                </li>
+                <li class="selected">
+                    <a href="{% url 'browse:browse_like' genre order_type %}">我的喜歡</a>
                 </li>
                 <li>
                     <a href="＃">我的追蹤</a>
@@ -30,7 +34,7 @@
             <ul class="filter-content">
                 {% for genre_iter in genre_list %}
                     <li {% if genre == genre_iter %}class="selected"{% endif %}>
-                        <a href="{% url 'browse:browse_all' genre_iter order_type %}">
+                        <a href="{% url 'browse:browse_like' genre_iter order_type %}">
                             {%  get_genre_name genre_iter %}
                         </a>
                 </li>
@@ -44,7 +48,7 @@
             <ul class="filter-content">
                 {% for type_iter in type_list %}
                     <li {% if order_type == type_iter %}class="selected"{% endif %}>
-                        <a href="{% url 'browse:browse_all' genre type_iter %}">
+                        <a href="{% url 'browse:browse_like' genre type_iter %}">
                             {{ type_iter }}
                         </a>
                     </li>

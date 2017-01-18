@@ -306,3 +306,5 @@ class SongLikeView(LoginRequiredMixin, View):
             song.total_likes = song.liked_by.count()
             song.save()
         return JsonResponse({'saved': 'OK'})
+
+

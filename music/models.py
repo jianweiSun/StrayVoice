@@ -94,3 +94,5 @@ class SongLikeShip(models.Model):
 
     class Meta:
         unique_together = ("user", "song")
+
+
