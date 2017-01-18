@@ -143,9 +143,9 @@
                 </div>
                 <div class="right in-line-55 like-wrapper">
                 {% if song in request.user.like_songs.all %}
-                    <i class="fa fa-heart fa-1x div-center red">&nbsp;{{ song.total_likes }}</i>
+                    <i class="queue-like-btn fa fa-heart fa-1x div-center red">&nbsp;{{ song.total_likes }}</i>
                 {% else %}
-                    <i class="fa fa-heart-o fa-1x div-center">&nbsp;{{ song.total_likes }}</i>
+                    <i class="queue-like-btn fa fa-heart-o fa-1x div-center">&nbsp;{{ song.total_likes }}</i>
                 {% endif %}
                 </div>
             </li>
@@ -160,7 +160,9 @@
 
 <div id="footer">
 </div>
-
+<script>
+ var csrfToken = "{{ csrf_token }}";
+</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="{% static 'js/player.js' %}"></script>
 {% block script %}

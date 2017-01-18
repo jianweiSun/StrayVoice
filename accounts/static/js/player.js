@@ -30,6 +30,7 @@ AudioPlayer.prototype.init = function(){
 	this.autoFetchNext();
 	this.queueCloseButtonSet();
 	this.queueClearButtonSet();
+	this.likeButtonSet();
 	// trigger the first song
     this.playQueue.find('li:first').find('i.queue-play-btn').trigger('click');
 }
@@ -294,10 +295,57 @@ AudioPlayer.prototype.queueClearButtonSet = function() {
             error: function(){ alert('錯誤') }
         });
     });
-}
+};
+
+ // bin the event to make btns on playqueue and now-playing song data work
+AudioPlayer.prototype.likeButtonSet = function() {
+    var self = this;
+    this.container.on('click', 'i.queue-like-btn', function(){
+        var $this = $(this),
+            $li = $this.closest('li'),
+            like_num = parseInt($this.text()),
+            song_id = $li.data('id'),
+            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': csrfToken },
+            url: "/music/song_like/",
+            data: {
+                'song_id': song_id,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (content_type != "application/json" ) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+
+                    if ($li.hasClass('active') || $li.parent().is('#playing-data-wrapper')) {
+                        var $btn_on_playing = self.container.find('ul#playing-data-wrapper i.queue-like-btn'),
+                            $btn_on_queue = $active = self.playQueue.find('li.active i.queue-like-btn');
+
+                        $this = $btn_on_playing.add($btn_on_queue);
+                    }
+
+                    if (action == 'like') {
+                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
+                                                       .text(' ' + (like_num+1));
+                    }
+                    else {
+                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
+                                                       .text(' ' + (like_num-1));
+                    }
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+};
 
 var audioplayer = new AudioPlayer($('#player-wrapper'));
 
 audioplayer.container.find('#icon-wrapper').on('click', 'a', function(e){
     e.preventDefault();
-})
+});

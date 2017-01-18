@@ -788,7 +788,7 @@ i.div-center {
 
 div.like-wrapper {
     position: relative;
-    width: 40px;
+    width: 20%;
 }
 
 div.close-wrapper {
@@ -811,7 +811,7 @@ i.queue-playing:hover {
 
 ul#playing-data-wrapper {
     height: inherit;
-    min-width: 25%;
+    width: 30%;
     position: relative;
     overflow: auto;
     float: left;
