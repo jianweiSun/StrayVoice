@@ -2,7 +2,7 @@
 {% load music_tags %}
 
 {% block type_title %}
-    我的喜歡
+    我的追蹤
 {% endblock %}
 
 {% block type_content %}
@@ -15,10 +15,10 @@
                         <a href="{% url 'browse:browse_all' genre order_type %}">所有音樂</a>
                     {% endif %}
                 </li>
-                <li class="selected">
+                <li>
                     <a href="{% url 'browse:browse_like' genre order_type %}">我的喜歡</a>
                 </li>
-                <li>
+                <li class="selected">
                     <a href="{% url 'browse:browse_follow' genre order_type %}">我的追蹤</a>
                 </li>
             </ul>
@@ -30,7 +30,7 @@
             <ul class="filter-content">
                 {% for genre_iter in genre_list %}
                     <li {% if genre == genre_iter %}class="selected"{% endif %}>
-                        <a href="{% url 'browse:browse_like' genre_iter order_type %}">
+                        <a href="{% url 'browse:browse_follow' genre_iter order_type %}">
                             {%  get_genre_name genre_iter %}
                         </a>
                 </li>
@@ -44,7 +44,7 @@
             <ul class="filter-content">
                 {% for type_iter in type_list %}
                     <li {% if order_type == type_iter %}class="selected"{% endif %}>
-                        <a href="{% url 'browse:browse_like' genre type_iter %}">
+                        <a href="{% url 'browse:browse_follow' genre type_iter %}">
                             {{ type_iter }}
                         </a>
                     </li>

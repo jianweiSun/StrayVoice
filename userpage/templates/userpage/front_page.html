@@ -34,12 +34,54 @@
                 {% endif %}
             </div>
             <div id="profile-right">
-                <div class="profile-right-small">
-                    <h1>{{ user.profile.nickname }}</h1>
+                <div class="profile-right-half">
+                    <h1 style="display: inline-block; vertical-align: middle;">{{ user.profile.nickname }}</h1>
+                    <div class="inline-middle right" style="width: 30%; margin-top: 22px;">
+                        {% if request.user != user %}
+                            {% if user.profile in request.user.profile.followings.all %}
+                                <button class="follow-btn followed" type="button" data-username="{{ user.username }}">已追蹤</button>
+                            {% else %}
+                                <button class="follow-btn" type="button" data-username="{{ user.username }}">追蹤</button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="profile-right-small"></div>
-                <div class="profile-right-small"></div>
+                <div class="profile-right-half">
+                    <table class="no-border">
+                        <thead>
+                            <tr>
+                                <td class="wid20">音樂</td>
+                                <td class="wid20">粉絲</td>
+                                <td class="wid20">追蹤中</td>
+                                <td class="wid40"></td>
+                            </tr>
+                        </thead>
+                        <tbody style="border-top: 20px solid white;">
+                            <tr>
+                                <td class="num">{{ user.songs.count }}</td>
+                                <td class="num">{{ user.profile.followers.count }}</td>
+                                <td class="num">{{ user.profile.followings.count }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
+        <div class="menu">
+            <ul>
+                <li>
+                    <a href="#">音樂</a>
+                </li>
+                <li>
+                    <a href="#">歌單</a>
+                </li>
+                <li>
+                    <a href="#">喜歡</a>
+                </li>
+                <li>
+                    <a href="#">關於</a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
@@ -55,4 +97,38 @@
     $('#id_head_portrait').on('change', function() {
         $(this).parents('form').submit();
     });
+
+    // follow-btn
+
+    $('button.follow-btn').on('click', function(){
+        var $this = $(this),
+            username = $this.data('username'),
+            action = $this.hasClass('followed') ? 'unfollow' : 'follow' ;
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'user_follow' %}",
+            data: {
+                'username': username,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (content_type != "application/json" ) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    if (action == 'follow') {
+                        $this.addClass('followed').text('已追蹤');
+                    }
+                    else {
+                        $this.removeClass('followed').text('追蹤');
+                    }
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
 {% endblock %}

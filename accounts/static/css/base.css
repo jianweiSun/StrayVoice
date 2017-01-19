@@ -173,12 +173,12 @@ button:hover {
 
 button[type="button"] {
     color: #5b5b5b;
-    border-color: #5b5b5b;
+    border-color: #888;
 }
 
-button[type="button"]:hover {
+button[type="button"]:hover, button.followed {
     color: white;
-    background-color: #5b5b5b;
+    background-color: #888;
 }
 
 .btn-fullwidth {
@@ -238,6 +238,7 @@ ul.errorlist {
 div.inputform h1 {
     margin: 0px 0px 30px 0px;
 }
+
 ul.dropdown-menu {
     display: none;
     position:fixed;
@@ -314,9 +315,11 @@ div.menu ul li:hover, div.menu ul li.selected {
 div.profile_row {
     overflow: auto;
     background-color: white;
+    margin-bottom: 30px;
 }
 div#profile {
     width: 340px;
+    position: relative;
 }
 
 div#profile form {
@@ -333,14 +336,15 @@ div#profile form p, div#profile form ul {
 }
 
 div#profile-right {
-    width: 640px;
+    width: 680px;
     float:left;
 }
 
-div.profile-right-small {
+div.profile-right-half {
     padding: 20px 30px;
     box-sizing: border-box;
-    height: 113px;
+    height: 170px;
+    width: 100%:
 }
 
 
@@ -878,6 +882,7 @@ i.play-song-br:hover {
 div.btns {
     width: 100%;
     margin-bottom: 10px;
+    position: relative;
 }
 
 div.btns i, a {
@@ -1001,3 +1006,37 @@ div.btns i.red{
     color: red;
 }
 
+/* front page */
+
+table.no-border td.num {
+    font-size: 2em;
+    color: #ff595f;
+}
+
+/* ＋新增 */
+ul.dropdown {
+    position: absolute;
+    margin-left: 5px;
+    display: inline-block;
+    vertical-align: top;
+    background-color: #e3e3e3;
+    border: 1px solid #888;
+    border-radius: 3px;
+    color: #5b5b5b;
+    padding: 0px 10px;
+    visibility: hidden;
+    width: 120px;
+    z-index: 5;
+}
+
+
+ul.dropdown li{
+    display: block;
+    padding: 10px;
+    cursor: pointer;
+}
+
+ul.dropdown li:hover {
+    cursor: pointer;
+    color: red;
+}

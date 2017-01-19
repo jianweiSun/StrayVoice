@@ -1,0 +1,35 @@
+{% load static %}
+{% load thumbnail %}
+
+<div class="side-bar">
+        <div class="row-no-color">
+            <div class="inline-middle">
+                {% if not object.user.frontpagecontent.head_portrait %}
+                    <img class="round" src="{% static 'img/default_head_portrait_big.jpeg' %}" height="80px" width="80px">
+                {% else %}
+                {% thumbnail object.user.frontpagecontent.head_portrait "80x80" crop="center" as im %}
+                    <img class="round" src="{{ im.url }}" width="{{ im.width }}" height="im.height">
+                {% endthumbnail %}
+                {% endif %}
+            </div>
+            <div class="inline-middle" style="font-size: 1.5em; margin-left: 15px;">
+                <a href="{% url 'userpage:front_page' object.user.username %}">
+                {{ object.user.profile.nickname }}
+                </a>
+            </div>
+        </div>
+        <div class="row-no-color">
+            {% if request.user != object.user %}
+                {% if object.user.profile in request.user.profile.followings.all %}
+                    <button class="follow-btn followed" type="button" data-username="{{ object.user.username }}">已追蹤</button>
+                {% else %}
+                    <button class="follow-btn" type="button" data-username="{{ object.user.username }}">追蹤</button>
+                {% endif %}
+            {% endif %}
+        </div>
+        <hr style="border-color: #7b7b7b">
+        <div class="row-no-color">
+            <div>喜歡</div>
+            <h1 style="color: #ff595f">{{ object.total_likes }}</h1>
+        </div>
+</div>

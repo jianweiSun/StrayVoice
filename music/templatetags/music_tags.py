@@ -21,3 +21,9 @@ def get_genre_name(genre_code):
                          (4, 'Singer/ Songwriter')]
         genre_dict = dict(GENRE_CHOICES)
         return genre_dict[int(genre_code)]
+
+
+@register.inclusion_tag('music/user_side_bar.html')
+def show_user_side_bar(request, obj):
+    return {'object': obj,
+            'request': request}

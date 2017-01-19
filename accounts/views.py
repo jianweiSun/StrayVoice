@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .forms import LoginForm, RegistrationForm, ProfileEditForm, \
     EmailEditForm, PasswordEditForm, AccountDeleteForm
 from django.contrib.auth import authenticate, login, logout
@@ -6,12 +6,15 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.contrib import messages
 from django.views.generic.base import View, TemplateResponseMixin
-from .models import Profile
+from .models import Profile, FollowShip
 from userpage.models import FrontPageContent
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponseNotFound
 from django.contrib.auth.views import _get_login_redirect_url
 from music.models import Album
+from playqueue.decorators import ajax_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User
 
 
 def user_login(request):
@@ -158,3 +161,28 @@ class AccountDeleteView(TemplateResponseMixin, LoginRequiredMixin, View):
             messages.error(request, '刪除失敗')
         return self.render_to_response({'form': form,
                                         'section': 'account_delete'})
+
+
+@method_decorator(ajax_required, name='dispatch')
+class UserFollowView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        username = request.POST.get('username')
+        action = request.POST.get('action')
+
+        user_to = get_object_or_404(User, username=username)
+        profile_to = user_to.profile
+        profile = request.user.profile
+        # prevent users follow themselves
+        if profile_to == profile:
+            return HttpResponseNotFound()
+
+        if action == 'follow':
+            FollowShip.objects.create(profile_from=profile, profile_to=profile_to)
+            profile_to.total_followers = profile_to.followers.count()
+            profile_to.save()
+        else:
+            FollowShip.objects.filter(profile_from=profile, profile_to=profile_to).delete()
+            profile_to.total_likes = profile_to.followers.count()
+            profile_to.save()
+        return JsonResponse({'saved': 'OK'})

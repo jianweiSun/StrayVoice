@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^change_email/$', views.EmailEditView.as_view(), name='email_edit'),
     url(r'^change_password/$', views.PasswordEditView.as_view(), name='password_edit'),
     url(r'^delete_account/$', views.AccountDeleteView.as_view(), name='account_delete'),
+    url(r'^follow/$', views.UserFollowView.as_view(), name='user_follow'),
 ]

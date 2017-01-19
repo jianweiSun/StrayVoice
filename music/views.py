@@ -219,10 +219,12 @@ class AlbumDetailView(TemplateResponseMixin, View):
     def get(self, request, username, album_id):
         owner = get_object_or_404(User, username=username)
         album = get_object_or_404(Album, user=owner, id=album_id)
+        songs = album.songs.all().order_by('order')
         # don't show default album
         if album.name == '未分類專輯':
             return HttpResponseNotFound()
-        return self.render_to_response({'album': album})
+        return self.render_to_response({'album': album,
+                                        'songs': songs})
 
 
 class UnAlbumSongsEditView(TemplateResponseMixin, LoginRequiredMixin, View):
@@ -258,6 +260,7 @@ class SongChangeAlbumView(TemplateResponseMixin, LoginRequiredMixin, View):
         if form.is_valid():
             prev_album = self.song.album
             album = form.cleaned_data['album']
+            # if change album, reset order to None, let OrderField handle it automatically
             if prev_album != album:
                 self.song.order = None
             self.song.album = album
@@ -308,6 +311,7 @@ class SongLikeView(LoginRequiredMixin, View):
         return JsonResponse({'saved': 'OK'})
 
 
+@method_decorator(ajax_required, name='dispatch')
 class AlbumLikeView(LoginRequiredMixin, View):
 
     def post(self, request):

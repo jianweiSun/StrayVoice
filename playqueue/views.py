@@ -60,7 +60,7 @@ class PlayQueueExchange(TemplateResponseMixin, View):
         ids_list = json.loads(request.GET['ids_list'])
         queue = PlayQueue(request)
         queue.exchange(ids_list)
-        return self.render_to_response({'queue': queue})
+        return self.render_to_response({'songs': queue})
 
 
 @method_decorator(ajax_required, name='dispatch')
@@ -72,5 +72,18 @@ class AlbumSongsExchange(TemplateResponseMixin, View):
         ids_lists = list(album.songs.values_list('id', flat=True).order_by('order'))
         queue = PlayQueue(request)
         queue.exchange(ids_lists)
-        return self.render_to_response({'queue': queue})
+        return self.render_to_response({'songs': queue})
+
+
+@method_decorator(ajax_required, name='dispatch')
+class AlbumSongsAppend(TemplateResponseMixin, View):
+    template_name = 'playqueue/queue_songs.html'
+
+    def get(self, request, album_id):
+        album = get_object_or_404(Album, id=album_id)
+        album_songs = album.songs.order_by('order')
+        ids_lists = list(album.songs.values_list('id', flat=True).order_by('order'))
+        queue = PlayQueue(request)
+        queue.extend(ids_lists)
+        return self.render_to_response({'songs': album_songs})
 

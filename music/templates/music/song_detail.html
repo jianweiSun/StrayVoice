@@ -9,32 +9,7 @@
 
 {% block content %}
 <div id="container">
-    <div class="side-bar">
-            <div class="row-no-color">
-                <div class="inline-middle">
-                    {% if not song.user.frontpagecontent.head_portrait %}
-                        <img class="round" src="{% static 'img/default_head_portrait_big.jpeg' %}" height="80px" width="80px">
-                    {% else %}
-                    {% thumbnail song.user.frontpagecontent.head_portrait "80x80" crop="center" as im %}
-                        <img class="round" src="{{ im.url }}" width="{{ im.width }}" height="im.height">
-                    {% endthumbnail %}
-                    {% endif %}
-                </div>
-                <div class="inline-middle" style="font-size: 1.5em; margin-left: 15px;">
-                    <a href="{% url 'userpage:front_page' song.user.username %}">
-                    {{ song.user.profile.nickname }}
-                    </a>
-                </div>
-            </div>
-            <div class="row-no-color">
-                <button type="button">追蹤</button>
-            </div>
-            <hr style="border-color: #7b7b7b">
-            <div class="row-no-color">
-                <div>喜歡</div>
-                <h1 style="color: #ff595f">{{ song.total_likes }}</h1>
-            </div>
-    </div>
+    {% show_user_side_bar request song %}
     <div class="content-container-left">
         <div style="overflow: auto;">
             <div class="wid25 left">
@@ -58,6 +33,10 @@
                         <i class="song-like-btn fa fa-heart-o fa-15x" style="margin-right: 20px;">&nbsp;{{ song.total_likes }}</i>
                     {% endif %}
                     <i class="fa fa-plus fa-15x">新增</i>
+                    <ul class="dropdown">
+                        <li class="song-add-queue">加入播放佇列</li>
+                        <li class="song-add-songlist">加入歌單</li>
+                    </ul>
                 </div>
                 <table class="no-border">
                     <tr>
@@ -113,6 +92,9 @@
 {% endblock %}
 
 {% block domready %}
+    var pos = document.URL.indexOf('/songs/'),
+        pos_last = document.URL.indexOf('/', pos+7),
+        song_id = document.URL.slice(pos+7, pos_last);
 
 // tag click
     $('div#tags a').on('click', function(e){
@@ -125,14 +107,11 @@
     });
 // handle page-play-btn
     $('i.page-play-btn').on('click', function(){
-        var pos = document.URL.indexOf('/songs/'),
-            pos_last = document.URL.indexOf('/', pos+7),
-            song_id = document.URL.slice(pos+7, pos_last),
-            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
+        var url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
 
         $.ajax({
             type: "GET",
-            url: url,
+            'url': url,
             dataType: "html",
             success : function(data){
                 $(data).prependTo(audioplayer.playQueue)
@@ -146,9 +125,6 @@
     $('i.song-like-btn').on('click', function(){
         var $this = $(this),
             like_num = parseInt($this.text()),
-            pos = document.URL.indexOf('/songs/'),
-            pos_last = document.URL.indexOf('/', pos+7),
-            id = document.URL.slice(pos+7, pos_last),
             action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
 
         $.ajax({
@@ -156,7 +132,7 @@
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             url: "{% url 'music:song_like' %}",
             data: {
-                song_id: id,
+                'song_id': song_id,
                 'action': action,
             },
             success : function(data, string, xhr){
@@ -178,5 +154,72 @@
             error: function(){ alert('錯誤') }
         });
     });
+
+// follow-btn
+    $('button.follow-btn').on('click', function(){
+        var $this = $(this),
+            username = $this.data('username'),
+            action = $this.hasClass('followed') ? 'unfollow' : 'follow' ;
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'user_follow' %}",
+            data: {
+                'username': username,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (content_type != "application/json" ) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    if (action == 'follow') {
+                        $this.addClass('followed').text('已追蹤');
+                    }
+                    else {
+                        $this.removeClass('followed').text('追蹤');
+                    }
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+// plus-btn toggle plus menu
+    $('i.fa-plus').on('click', function(){
+        var $this = $(this),
+            $menu = $this.siblings('ul.dropdown');
+
+        if ($menu.css('visibility') == 'hidden') {
+            $menu.css('visibility', 'visible');
+        }
+        else {
+            $menu.css('visibility', 'hidden');
+        }
+    });
+
+// song-add-queue
+    $('li.song-add-queue').on('click', function(){
+        var $this = $(this),
+            url = "{% url 'playqueue:song_append' '00000' %}".replace('00000', song_id);
+
+        $.ajax({
+            type: "GET",
+            'url': url,
+            dataType: "html",
+            success : function(data){
+                $(data).appendTo(audioplayer.playQueue);
+                $this.parent().css('visibility', 'hidden');
+                if (audioplayer.playQueue.find('li.active').length == 0) {
+                    audioplayer.playQueue.children().first()
+                                         .find('i.queue-play-btn').trigger('click');
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
 
 {% endblock %}

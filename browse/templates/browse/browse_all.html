@@ -1,176 +1,50 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load thumbnail %}
+{% extends 'browse/browse_base.html' %}
 {% load music_tags %}
 
-{% block title %}
-    {% get_genre_name genre %} - 所有音樂 | StrayVoice
+{% block type_title %}
+    所有音樂
 {% endblock %}
 
-{% block content %}
-<div id="container">
-    <div id="content-container-85">
-        <div class="menu">
-            <ul>
-                <li class="selected">
-                    <a href="{% url 'browse:browse_all' genre order_type %}">所有音樂</a>
-                </li>
-                <li>
-                    <a href="{% url 'browse:browse_like' genre order_type%}">我的喜歡</a>
-                </li>
-                <li>
-                    <a href="＃">我的追蹤</a>
-                </li>
-            </ul>
-        </div>
-        <div class="filter">
-            <div class="filter-title">
-                類型
-            </div>
-            <ul class="filter-content">
-                {% for genre_iter in genre_list %}
-                    <li {% if genre == genre_iter %}class="selected"{% endif %}>
-                        <a href="{% url 'browse:browse_all' genre_iter order_type %}">
-                            {%  get_genre_name genre_iter %}
-                        </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="filter">
-            <div class="filter-title">
-                排序
-            </div>
-            <ul class="filter-content">
-                {% for type_iter in type_list %}
-                    <li {% if order_type == type_iter %}class="selected"{% endif %}>
-                        <a href="{% url 'browse:browse_all' genre type_iter %}">
-                            {{ type_iter }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="margin-t30-b20">
-            <div class="inline-middle">
-                <i class="songlist-play-btn fa fa-play-circle fa-3x big-play-btn"></i>
-            </div>
-            <div class="inline-middle" style="color: #ff595f; font-size: 1.5em; margin-left: 10px;">全部播放</div>
-        </div>
-        <div id="songs-box">
-            {% for song in songs %}
-            <div class="song-box" data-id="{{ song.id }}">
-                <div class="cover-playbtn">
-                    {% if not song.cover %}
-                        <img src="{% static 'img/no_image_photo.png' %}" height="175px" width="175px">
-                    {% else %}
-                    {% thumbnail song.cover "175x175" crop="center" as im %}
-                        <img src="{{ im.url }}" height="175px" width="175px">
-                    {% endthumbnail %}
-                    {% endif %}
-                        <i class="page-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
-                </div>
-                <div>
-                    <div class="song-box-title left text-ellipsis">
-                        <a href="{{ song.get_absolute_url }}">
-                            {{ song.name }}
-                        </a>
-                    </div>
-                    <div class="btns left" style="margin-bottom:5px;">
-                        <a href="{% url 'userpage:front_page' song.user.username %}">
-                            {{ song.user.profile.nickname }}
-                        </a>
-                    </div>
-                    <div class="btns left">
-                        {% if song in request.user.like_songs.all %}
-                            <i class="song-like-btn fa fa-heart fa-1x red" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
-                        {% else %}
-                            <i class="song-like-btn fa fa-heart-o fa-1x" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
-                        {% endif %}
-                        <i class="fa fa-plus fa-1x">新增</i>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+{% block type_content %}
+<div class="menu">
+    <ul>
+        <li class="selected">
+            <a href="{% url 'browse:browse_all' genre order_type %}">所有音樂</a>
+        </li>
+        <li>
+            <a href="{% url 'browse:browse_like' genre order_type%}">我的喜歡</a>
+        </li>
+        <li>
+            <a href="{% url 'browse:browse_follow' genre order_type %}">我的追蹤</a>
+        </li>
+    </ul>
 </div>
-{% endblock %}
-
-{% block domready %}
-
-// handle page-play-btn
-    $('i.page-play-btn').on('click', function(){
-        var song_id = $(this).closest('div.song-box').data('id'),
-            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "html",
-            success : function(data){
-                $(data).prependTo(audioplayer.playQueue)
-                       .find('i.queue-play-btn').trigger('click');
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
-
-// handle songlist-play-btn
-    $('i.songlist-play-btn').on('click', function(){
-        var tmp_array = new Array(),
-            songs = $('div#songs-box').children();
-
-        songs.each(function(index, item){
-            var song_id = $(this).data('id');
-            tmp_array.push(song_id);
-        });
-
-        $.ajax({
-            type: "GET",
-            url: "{% url 'playqueue:queue_exchange' %}",
-            dataType: "html",
-            data: {ids_list: JSON.stringify(tmp_array)},
-            success : function(data, status, jqXHR){
-                $(data).prependTo(audioplayer.playQueue.empty());
-                audioplayer.forwardButton.trigger('click');
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
-
-// song-like-btn
-    $('i.song-like-btn').on('click', function(){
-        var $this = $(this),
-            like_num = parseInt($this.text()),
-            song_id = $(this).closest('div.song-box').data('id'),
-            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
-
-        $.ajax({
-            type: "POST",
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            url: "{% url 'music:song_like' %}",
-            data: {
-                'song_id': song_id,
-                'action': action,
-            },
-            success : function(data, string, xhr){
-                var content_type = xhr.getResponseHeader('Content-Type');
-                if (content_type != "application/json" ) {
-                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
-                }
-                else {
-                    if (action == 'like') {
-                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
-                                                       .text(' ' + (like_num+1));
-                    }
-                    else {
-                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
-                                                       .text(' ' + (like_num-1));
-                    }
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
-
+<div class="filter">
+    <div class="filter-title">
+        類型
+    </div>
+    <ul class="filter-content">
+        {% for genre_iter in genre_list %}
+            <li {% if genre == genre_iter %}class="selected"{% endif %}>
+                <a href="{% url 'browse:browse_all' genre_iter order_type %}">
+                    {%  get_genre_name genre_iter %}
+                </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="filter">
+    <div class="filter-title">
+        排序
+    </div>
+    <ul class="filter-content">
+        {% for type_iter in type_list %}
+            <li {% if order_type == type_iter %}class="selected"{% endif %}>
+                <a href="{% url 'browse:browse_all' genre type_iter %}">
+                    {{ type_iter }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

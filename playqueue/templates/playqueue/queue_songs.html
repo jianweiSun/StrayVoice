@@ -1,7 +1,7 @@
 {% load static %}
 {% load thumbnail %}
 
-{% for song in queue %}
+{% for song in songs %}
 <li data-id="{{ song.id }}" data-src="{{ song.file.url }}">
     <div class="small-song-icon" style="height: 55px; width: 55px;">
             {% if not song.cover %}

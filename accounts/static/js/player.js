@@ -68,19 +68,19 @@ AudioPlayer.prototype.playOrPause = function(e){
 
     e.preventDefault();
 
-	if (this.audio.paused) {
-		this.audio.play();
-		this.playButton.removeClass('fa-play')
-		               .addClass('fa-pause');
-		$queue_btn.removeClass().addClass(active_play);
-	}
-	else {
-		this.audio.pause();
-		this.playButton.removeClass('fa-pause')
-		               .addClass('fa-play');
-		$queue_btn.removeClass().addClass(active_pause);
+    if (this.audio.paused) {
+        this.audio.play();
+        this.playButton.removeClass('fa-play')
+                       .addClass('fa-pause');
+        $queue_btn.removeClass().addClass(active_play);
+    }
+    else {
+        this.audio.pause();
+        this.playButton.removeClass('fa-pause')
+                       .addClass('fa-play');
+        $queue_btn.removeClass().addClass(active_pause);
 
-	}
+    }
 }
 
 AudioPlayer.prototype.timeUpdate = function() {
@@ -193,8 +193,15 @@ AudioPlayer.prototype.queuePlayButtonSet = function() {
 AudioPlayer.prototype.forwardButtonSet = function() {
     var self = this;
     this.forwardButton.on('click', function(){
-        var next = self.playQueue.find('li.active').next(),
-            first = self.playQueue.find('li').first();
+       var $active = self.playQueue.find('li.active')
+            next = $active.next(),
+            first = self.playQueue.find('li').first(),
+            length = self.playQueue.find('li').length;
+
+        if (length == 1 && $active.length==1){
+            return;
+        }
+
         if (self.repeatButton.hasClass('fa-rotate-left')) {
             if (next.length) {
                 next.find('i.queue-play-btn').trigger('click');
@@ -213,8 +220,15 @@ AudioPlayer.prototype.forwardButtonSet = function() {
 AudioPlayer.prototype.backwardButtonSet = function() {
     var self = this;
     this.backwardButton.on('click', function(){
-        var prev = self.playQueue.find('li.active').prev(),
+       var  $active = self.playQueue.find('li.active'),
+            prev = $active.prev(),
             last = self.playQueue.find('li').last();
+            length = self.playQueue.find('li').length;
+
+        if (length == 1 && $active.length==1){
+            return;
+        }
+
         if (self.repeatButton.hasClass('fa-rotate-left')) {
             if (prev.length) {
                 prev.find('i.queue-play-btn').trigger('click');
@@ -277,6 +291,12 @@ AudioPlayer.prototype.queueCloseButtonSet = function() {
                     self.forwardButton.trigger('click');
                 }
                 $li.remove();
+                // if clear all, make the audio pause
+                if (!self.playQueue.find('li').length) {
+                    if (!self.audio.paused) {
+                        self.playButton.trigger('click');
+                    }
+                }
             },
             error: function(){ alert('錯誤') }
         });
@@ -291,6 +311,10 @@ AudioPlayer.prototype.queueClearButtonSet = function() {
             url: "/playqueue/clear/",
             success : function() {
                 self.playQueue.empty();
+                // if clear all, make the audio pause
+                if (!self.audio.paused) {
+                    self.playButton.trigger('click');
+                }
             },
             error: function(){ alert('錯誤') }
         });
