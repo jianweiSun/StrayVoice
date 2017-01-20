@@ -58,6 +58,29 @@
             </div>
             {% endfor %}
         </div>
+        <ul class="pagination">
+            <li class="step-links">
+                {% if songs.has_previous %}
+                    <a href="?page={{ songs.previous_page_number }}">上一頁</a>
+                {% else %}
+                    <span class="unactive_page">
+                        上一頁
+                    </span>
+                {% endif %}
+            </li>
+                <li class="current">
+                    第  {{ songs.number }}  頁
+                </li>
+            <li>
+                {% if songs.has_next %}
+                    <a href="?page={{ songs.next_page_number }}">下一頁</a>
+                {% else %}
+                    <span class="unactive_page">
+                        下一頁
+                    </span>
+                {% endif %}
+            </li>
+        </ul>
     </div>
 </div>
 {% endblock %}

@@ -41,7 +41,7 @@
         {% for type_iter in type_list %}
             <li {% if order_type == type_iter %}class="selected"{% endif %}>
                 <a href="{% url 'browse:browse_all' genre type_iter %}">
-                    {{ type_iter }}
+                    {% get_order_type_name type_iter %}
                 </a>
             </li>
         {% endfor %}

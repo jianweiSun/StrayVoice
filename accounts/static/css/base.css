@@ -976,6 +976,10 @@ ul.filter-content li.selected {
 
 /* ------ song-box --------*/
 
+div#songs-box {
+    overflow: auto;
+}
+
 div.song-box {
     width: 16.66%;
     float: left;
@@ -1039,4 +1043,24 @@ ul.dropdown li{
 ul.dropdown li:hover {
     cursor: pointer;
     color: red;
+}
+
+/*  pagination  */
+
+ul.pagination {
+    text-align: center;
+    color: #2b2b2b;
+}
+ul.pagination li a {
+    color: #2b2b2b;
+}
+
+ul.pagination li a:hover {
+    color: red;
+}
+
+
+ul li span.unactive_page {
+    padding: 20px 15px;
+    opacity: 0.5;
 }

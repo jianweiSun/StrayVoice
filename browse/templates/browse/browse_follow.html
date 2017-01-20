@@ -9,14 +9,18 @@
 <div class="menu">
             <ul>
                 <li>
-                    {% if order_type == 'recent_liked' %}
+                    {% if order_type == 'recent_followed' %}
                         <a href="{% url 'browse:browse_all' genre 'latest' %}">所有音樂</a>
                     {% else %}
                         <a href="{% url 'browse:browse_all' genre order_type %}">所有音樂</a>
                     {% endif %}
                 </li>
                 <li>
-                    <a href="{% url 'browse:browse_like' genre order_type %}">我的喜歡</a>
+                    {% if order_type == 'recent_followed' %}
+                        <a href="{% url 'browse:browse_like' genre 'recent_liked' %}">我的喜歡</a>
+                    {% else %}
+                        <a href="{% url 'browse:browse_like' genre order_type %}">我的喜歡</a>
+                    {% endif %}
                 </li>
                 <li class="selected">
                     <a href="{% url 'browse:browse_follow' genre order_type %}">我的追蹤</a>
@@ -45,7 +49,7 @@
                 {% for type_iter in type_list %}
                     <li {% if order_type == type_iter %}class="selected"{% endif %}>
                         <a href="{% url 'browse:browse_follow' genre type_iter %}">
-                            {{ type_iter }}
+                            {% get_order_type_name type_iter %}
                         </a>
                     </li>
                 {% endfor %}

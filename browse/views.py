@@ -4,6 +4,7 @@ from django.http import HttpResponseNotFound
 from music.models import Song
 from accounts.models import FollowShip
 from itertools import chain
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class BrowseAllView(TemplateResponseMixin, View):
@@ -25,6 +26,15 @@ class BrowseAllView(TemplateResponseMixin, View):
             queryset = queryset.order_by('-created', 'user')
         elif order_type == 'most_liked':
             queryset = queryset.order_by('-total_likes', 'user')
+
+        queryset_paginator = Paginator(queryset, 12)
+        page = request.GET.get('page')
+        try:
+            queryset = queryset_paginator.page(page)
+        except PageNotAnInteger:
+            queryset = queryset_paginator.page(1)
+        except EmptyPage:
+            queryset = queryset_paginator.page(queryset_paginator.num_pages)
 
         return self.render_to_response({'songs': queryset,
                                         'genre': genre,
@@ -55,6 +65,15 @@ class BrowseLikeView(LoginRequiredMixin, TemplateResponseMixin, View):
         elif order_type == 'recent_liked':
             queryset = queryset.order_by('-songlikeship__created', 'user')
 
+        queryset_paginator = Paginator(queryset, 12)
+        page = request.GET.get('page')
+        try:
+            queryset = queryset_paginator.page(page)
+        except PageNotAnInteger:
+            queryset = queryset_paginator.page(1)
+        except EmptyPage:
+            queryset = queryset_paginator.page(queryset_paginator.num_pages)
+
         return self.render_to_response({'songs': queryset,
                                         'genre': genre,
                                         'order_type': order_type,
@@ -67,7 +86,7 @@ class BrowseFollowView(LoginRequiredMixin, TemplateResponseMixin, View):
 
     def dispatch(self, request, *args, genre=None, order_type=None, **kwargs):
         genre_choice = {'0', '1', '2', '3', '4', 'all'}
-        order_choice = {'latest', 'most_liked', 'recent_liked'}
+        order_choice = {'latest', 'most_liked', 'recent_followed'}
         if genre not in genre_choice or order_type not in order_choice:
             return HttpResponseNotFound()
         return super(BrowseFollowView, self).dispatch(request, *args, genre, order_type, **kwargs)
@@ -84,17 +103,27 @@ class BrowseFollowView(LoginRequiredMixin, TemplateResponseMixin, View):
         elif order_type == 'most_liked':
             queryset = queryset.order_by('-total_likes', 'user')
         # Combine the querysets so that we can use the same templates
-        elif order_type == 'recent_liked':
+        elif order_type == 'recent_followed':
             followship_obj = FollowShip.objects.filter(profile_from=request.user.profile).order_by('-created')
             if genre == 'all':
                 queryset_by_user_list = [obj.profile_to.user.songs.all() for obj in followship_obj]
-                queryset = chain.from_iterable(queryset_by_user_list)
+                queryset = list(chain.from_iterable(queryset_by_user_list))
             else:
                 queryset_by_user_list = [obj.profile_to.user.songs.filter(genre=genre) for obj in followship_obj]
-                queryset = chain.from_iterable(queryset_by_user_list)
+                queryset = list(chain.from_iterable(queryset_by_user_list))
+
+        # to make pagination we must turn itertools.chain to list, so it has length
+        queryset_paginator = Paginator(queryset, 12)
+        page = request.GET.get('page')
+        try:
+            queryset = queryset_paginator.page(page)
+        except PageNotAnInteger:
+            queryset = queryset_paginator.page(1)
+        except EmptyPage:
+            queryset = queryset_paginator.page(queryset_paginator.num_pages)
 
         return self.render_to_response({'songs': queryset,
                                         'genre': genre,
                                         'order_type': order_type,
                                         'genre_list': ['all', '1', '2', '3', '4', '0'],
-                                        'type_list': ['latest', 'most_liked', 'recent_liked']})
+                                        'type_list': ['latest', 'most_liked', 'recent_followed']})
