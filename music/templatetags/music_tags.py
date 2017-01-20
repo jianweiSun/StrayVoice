@@ -9,6 +9,12 @@ def show_albums_bar(all_albums, album=None):
             'album': album}
 
 
+@register.inclusion_tag('music/manage/playlist_bar.html')
+def show_playlists_bar(all_playlists, playlist=None):
+    return {'all_playlists': all_playlists,
+            'playlist': playlist}
+
+
 @register.simple_tag
 def get_genre_name(genre_code):
     if genre_code == 'all':

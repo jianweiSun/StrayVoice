@@ -123,6 +123,9 @@ class Playlist(models.Model):
     liked_by = models.ManyToManyField(User, through='PlaylistLikeShip', related_name='like_playlists')
     total_likes = models.IntegerField(default=0)
 
+    class Meta:
+        ordering = ('-created', )
+
     def __str__(self):
         return self.name
 

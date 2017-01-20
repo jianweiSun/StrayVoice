@@ -1,0 +1,12 @@
+<div class="row-left-25">
+    <a href="{% url 'music:playlist_create' %}">
+        <button>新增歌單</button>
+    </a>
+    <ul class="vertical">
+        {% for playlist_item in all_playlists %}
+            <li {% if playlist_item == playlist %}class="selected"{% endif %}>
+                <a href="{% url 'music:playlist_edit' playlist_item.id %}">{{ playlist_item.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

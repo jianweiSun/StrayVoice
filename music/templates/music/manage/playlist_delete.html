@@ -1,0 +1,38 @@
+{% extends "music/manage/manage_base.html" %}
+{% load static %}
+{% load music_tags %}
+
+{% block title %}刪除歌單｜Strayvoice {% endblock %}
+
+{% block nav_head %}
+    <ul id="nav-head">
+        <li>
+            <a href="{% url 'music:playlist_edit' request.user.playlists.first.id %}">管理歌單</a>
+        </li>
+        <li>
+            <a href="{% url 'music:playlist_edit' playlist.id %}">{{ playlist.name }}</a>
+        </li>
+        <li class="unactive">
+            刪除專輯
+        </li>
+    </ul>
+{% endblock %}
+
+{% block manage_content %}
+{% show_playlists_bar all_playlists playlist %}
+<div class="row-right-75">
+    <h1>刪除歌單</h1>
+    <form action="" method="post">
+        <p>若確認刪除歌單： {{ playlist.name }}</p>
+        <p>請按下確認鍵。</p>
+        {% csrf_token %}
+        <p>
+            <a href="{% url 'music:playlist_edit' playlist.id %}">
+                <button class="wid20" type="button">取消</button>
+            </a>
+            <button class="wid20" type="submit">確認</button>
+        </p>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Song, Album
+from .models import Song, Album, Playlist
 from .validators import validate_mp3
 
 
@@ -40,3 +40,10 @@ class SongChangeAlbumForm(forms.Form):
         super(SongChangeAlbumForm, self).__init__(*args, **kwargs)
         self.fields['album'] = forms.ModelChoiceField(queryset=Album.objects.filter(user=user),
                                                       initial=user.albums.get(name='未分類專輯'))
+
+
+class PlaylistCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Playlist
+        fields = ('cover', 'name', 'description', 'published')

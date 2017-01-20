@@ -7,21 +7,21 @@
 {% block nav_head %}
     <ul id="nav-head">
         <li>
-            <a href="{% url 'music:un_album_songs' %}">管理音樂</a>
+            <a href="#">管理歌單</a>
         </li>
         <li class="unactive">
-            &nbsp;&nbsp;新增專輯
+            &nbsp;&nbsp;新增歌單
         </li>
     </ul>
 {% endblock %}
 
 {% block manage_content %}
-{% show_albums_bar all_albums %}
+{% show_playlists_bar all_playlists %}
 <div class="row-right-75">
     <form action="" method="post" enctype="multipart/form-data">
         <div id="manage-form-cover">
             <img id='img-preview' width="250px" height="250px" src="{% static 'img/no_image_photo.png' %}">
-            <label for="{{ form.cover.id_for_label }}" class="button-like">上傳專輯封面</label>
+            <label for="{{ form.cover.id_for_label }}" class="button-like">上傳歌單封面</label>
             {{ form.cover }}
             {{ form.cover.errors }}
         </div>
@@ -29,8 +29,9 @@
             {{ form.name.errors }}
             <div class="form-input">{{ form.name }}</div>
             <div class="form-input">{{  form.description }}</div>
+            <div class="form-input">{{ form.published }}</div>
             <p>
-                <button type="submit">儲存並上傳專輯</button>
+                <button type="submit">儲存並上傳歌單</button>
             </p>
         </div>
         {% csrf_token %}
@@ -39,8 +40,8 @@
 {% endblock %}
 
 {% block domready %}
-    $('#id_name').attr('placeholder', '請輸入專輯名稱');
-    $('#id_description').attr('placeholder', '請輸入專輯介紹文字');
+    $('#id_name').attr('placeholder', '請輸入歌單名稱');
+    $('#id_description').attr('placeholder', '請輸入歌單介紹文字');
 
     // img preview
     var readURL = function(input) {

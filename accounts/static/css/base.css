@@ -547,14 +547,14 @@ div.row-right-75 {
     padding-left: 30px;
 }
 
-div#album-cover {
+div#manage-form-cover {
     width: 35%;
     float: left;
     padding: 0px 22px 0px 0px;
     box-sizing: border-box;
 }
 
-div#album-data {
+div#manage-form-data {
     width: 65%;
     float: left;
     box-sizing: border-box;

@@ -2,9 +2,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import SongCreateForm, AlbumCreateForm, SongChangeAlbumForm
+from .forms import SongCreateForm, AlbumCreateForm, SongChangeAlbumForm, PlaylistCreateForm
 from django.contrib import messages
-from .models import Album, Song, SongLikeShip, AlbumLikeShip
+from .models import Album, Song, SongLikeShip, AlbumLikeShip, Playlist
 from django.urls import reverse
 from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse
 from django.utils.decorators import method_decorator
@@ -331,3 +331,88 @@ class AlbumLikeView(LoginRequiredMixin, View):
             album.total_likes = album.liked_by.count()
             album.save()
         return JsonResponse({'saved': 'OK'})
+
+
+class PlaylistCreateView(TemplateResponseMixin, LoginRequiredMixin, View):
+    template_name = 'music/manage/playlist_create.html'
+
+    def get(self, request):
+        form = PlaylistCreateForm()
+        all_playlists = Playlist.objects.filter(user=request.user)
+
+        return self.render_to_response({'form': form,
+                                        'section': 'playlist_management',
+                                        'all_playlists': all_playlists})
+
+    def post(self, request):
+        form = PlaylistCreateForm(data=request.POST,
+                                  files=request.FILES)
+        if form.is_valid():
+            playlist = form.save(commit=False)
+            playlist.user = request.user
+            playlist.save()
+            messages.success(request, '歌單新增成功')
+            return redirect(reverse('music:playlist_edit', args=[playlist.id]))
+        else:
+            messages.error(request, '歌單新增失敗')
+        return self.render_to_response({'form': form,
+                                        'section': 'playlist_management'})
+
+
+class PlaylistEditView(TemplateResponseMixin, LoginRequiredMixin, View):
+    template_name = 'music/manage/playlist_edit.html'
+
+    def dispatch(self, request, *args, playlist_id=None, **kwargs):
+        self.playlist = get_object_or_404(Playlist, user=request.user, id=playlist_id)
+        self.songs = self.playlist.songs.order_by('playlistsongsship__order')
+        return super(PlaylistEditView, self).dispatch(request, *args, playlist_id, **kwargs)
+
+    def get(self, request, playlist_id):
+        form = PlaylistCreateForm(instance=self.playlist)
+        all_playlists = Playlist.objects.filter(user=request.user)
+
+        return self.render_to_response({'form': form,
+                                        'playlist': self.playlist,
+                                        'songs': self.songs,
+                                        'section': 'playlist_management',
+                                        'all_playlists': all_playlists})
+
+    def post(self, request, playlist_id):
+        form = PlaylistCreateForm(data=request.POST,
+                                  files=request.FILES,
+                                  instance=self.playlist)
+        all_playlists = Playlist.objects.filter(user=request.user)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, '歌單編輯成功')
+        else:
+            messages.success(request, '歌單編輯失敗')
+        return self.render_to_response({'form': form,
+                                        'playlist': self.playlist,
+                                        'songs': self.songs,
+                                        'section': 'playlist_management',
+                                        'all_playlists': all_playlists})
+
+
+class PlaylistDeleteView(LoginRequiredMixin, DeleteView):
+    template_name = 'music/manage/playlist_delete.html'
+
+    def dispatch(self, request, *args, playlist_id=None, **kwargs):
+        self.user = request.user
+        self.playlist = get_object_or_404(Playlist, user=request.user, id=playlist_id)
+        self.all_playlists = Playlist.objects.filter(user=request.user)
+
+        return super(PlaylistDeleteView, self).dispatch(request, *args, playlist_id, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.playlist
+
+    def get_context_data(self, **kwargs):
+        context = super(PlaylistDeleteView, self).get_context_data(**kwargs)
+        context['playlist'] = self.playlist
+        context['all_playlists'] = self.all_playlists
+        return context
+
+    def get_success_url(self):
+        return reverse('music:playlist_create')

@@ -9,7 +9,7 @@
             </a>
         </li>
         {% for album_item in all_albums %}
-            <li {% if album_item.name == album.name %}class="selected"{% endif %}>
+            <li {% if album_item == album %}class="selected"{% endif %}>
                 <a href="{% url 'music:album_edit' album_item.id %}">{{ album_item.name }}</a>
             </li>
         {% endfor %}

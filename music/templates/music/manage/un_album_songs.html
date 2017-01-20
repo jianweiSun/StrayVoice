@@ -55,7 +55,7 @@
                     </a>
                 </td>
                 <td>
-                    <a id="song_change_album" href="{% url 'music:song_change_album' song.id %}" class="btn">
+                    <a class="song-change-album btn" href="{% url 'music:song_change_album' song.id %}">
                         移至
                     </a>
                 </td>
@@ -77,7 +77,7 @@
     });
 
     // deal with song_change_album
-        $('a#song_change_album').on('click', function(e){
+        $('a.song-change-album').on('click', function(e){
             var url = $(this).attr('href'),
                 $body = $('body');
             e.preventDefault();
