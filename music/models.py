@@ -89,7 +89,7 @@ class Song(models.Model):
 class SongLikeShip(models.Model):
     user = models.ForeignKey(User)
     song = models.ForeignKey(Song)
-    created = models.DateField(auto_now_add=True, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def __str__(self):
         return '{} likes {}'.format(self.user, self.song)
@@ -101,7 +101,7 @@ class SongLikeShip(models.Model):
 class AlbumLikeShip(models.Model):
     user = models.ForeignKey(User)
     album = models.ForeignKey(Album)
-    created = models.DateField(auto_now_add=True, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def __str__(self):
         return '{} likes {}'.format(self.user, self.album)
