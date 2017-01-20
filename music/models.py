@@ -9,7 +9,7 @@ class Album(models.Model):
     name = models.CharField(max_length=30)
     description = models.TextField(max_length=500, blank=True)
     cover = models.ImageField(upload_to='images/album_cover/%Y/%m/%d', blank=True)
-    created = models.DateField(auto_now_add=True, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     liked_by = models.ManyToManyField(User, through='AlbumLikeShip', related_name='like_albums')
     total_likes = models.IntegerField(default=0)
 
@@ -57,7 +57,7 @@ class Song(models.Model):
     authorization = models.IntegerField(choices=AUTHORIZATION_CHOICES, default=0)
     published = models.BooleanField(choices=PUBLISHED_CHOICES, default=True)
     lyrics = models.TextField(blank=True)
-    created = models.DateField(auto_now_add=True, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     liked_by = models.ManyToManyField(User, through='SongLikeShip', related_name='like_songs')
     total_likes = models.IntegerField(default=0)
 
