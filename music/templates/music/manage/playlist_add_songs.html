@@ -1,0 +1,9 @@
+<h2>將歌曲加入</h2>
+<form action="{% url 'music:playlist_add' 'song' song.id %}" method="post">
+    {{ form.playlist }}
+    {% csrf_token %}
+    <p style="text-align: right;">
+        <button class="wid20" type="button">取消</button>
+        <button class="wid20" type="submit">確定</button>
+    </p>
+</form>

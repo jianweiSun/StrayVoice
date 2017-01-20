@@ -2,14 +2,15 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import SongCreateForm, AlbumCreateForm, SongChangeAlbumForm, PlaylistCreateForm
+from .forms import SongCreateForm, AlbumCreateForm, SongChangeAlbumForm, PlaylistCreateForm, PlaylistAddSongsForm
 from django.contrib import messages
-from .models import Album, Song, SongLikeShip, AlbumLikeShip, Playlist
+from .models import Album, Song, SongLikeShip, AlbumLikeShip, Playlist, PlayListSongsShip
 from django.urls import reverse
 from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from playqueue.decorators import ajax_required
+from django.db.models import F
 import json
 
 
@@ -364,7 +365,9 @@ class PlaylistEditView(TemplateResponseMixin, LoginRequiredMixin, View):
 
     def dispatch(self, request, *args, playlist_id=None, **kwargs):
         self.playlist = get_object_or_404(Playlist, user=request.user, id=playlist_id)
-        self.songs = self.playlist.songs.order_by('playlistsongsship__order')
+        self.songs = self.playlist.songs\
+                                  .order_by('playlistsongsship__order')\
+                                  .annotate(playlist_order=F('playlistsongsship__order'))
         return super(PlaylistEditView, self).dispatch(request, *args, playlist_id, **kwargs)
 
     def get(self, request, playlist_id):
@@ -416,3 +419,51 @@ class PlaylistDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('music:playlist_create')
+
+
+class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
+    template_name = 'music/manage/playlist_add_songs.html'
+
+    def dispatch(self, request, *args, model_type=None, id=None, **kwargs):
+        type_choice = {'song', 'album', 'playlist'}
+        if model_type not in type_choice:
+            return HttpResponseNotFound()
+
+        if model_type == 'song':
+            self.song = get_object_or_404(Song, id=id)
+            return super(PlaylistAddSongsView, self).dispatch(request, *args, model_type, id, **kwargs)
+
+    def get(self, request, model_type, id):
+        if not request.user.playlists.all():
+            template_name = 'music/manage/playlist_not_exist.html'
+            return self.render_to_response({})
+
+        form = PlaylistAddSongsForm(user=request.user)
+
+        return self.render_to_response({'form': form,
+                                        'song': self.song})
+
+    def post(self, request, model_type, id):
+        form = PlaylistAddSongsForm(user=request.user,
+                                    data=request.POST)
+        if form.is_valid():
+            playlist = form.cleaned_data['playlist']
+            if model_type == 'song':
+                PlayListSongsShip.objects.create(playlist=playlist, song=self.song)
+            return JsonResponse({'saved': 'OK'})
+        else:
+            return HttpResponseForbidden()
+
+
+class PlaylistDeleteSongView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        playlist_id = request.POST.get('playlist_id')
+        song_id = request.POST.get('song_id')
+        order = request.POST.get('order')
+
+        playlist = get_object_or_404(Playlist, user=request.user, id=playlist_id)
+        song = get_object_or_404(Song, id=song_id)
+        PlayListSongsShip.objects.filter(playlist=playlist, song=song, order=order).delete()
+
+        return JsonResponse({'saved': 'OK'})

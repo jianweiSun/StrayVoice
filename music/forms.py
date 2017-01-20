@@ -47,3 +47,12 @@ class PlaylistCreateForm(forms.ModelForm):
     class Meta:
         model = Playlist
         fields = ('cover', 'name', 'description', 'published')
+
+
+class PlaylistAddSongsForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(PlaylistAddSongsForm, self).__init__(*args, **kwargs)
+        self.fields['playlist'] = forms.ModelChoiceField(queryset=Playlist.objects.filter(user=user),
+                                                         initial=user.playlists.all().first())

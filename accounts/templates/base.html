@@ -62,7 +62,7 @@
        <a href="{% url 'music:un_album_songs' %}">管理音樂</a>
     </li>
     <li>
-       <a href="#">管理歌單</a>
+       <a href="{% url 'music:playlist_edit' request.user.playlists.first.id %}">管理歌單</a>
     </li>
     <li class="divider"></li>
     <li>

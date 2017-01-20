@@ -61,7 +61,7 @@
         </thead>
         <tbody id="sort-table">
             {% for song in songs %}
-            <tr class='song-row' data-id="{{ song.id }}">
+            <tr class='song-row' data-id="{{ song.id }}" data-order="{{ song.playlist_order }}">
                 <td>{{ forloop.counter }}</td>
                 <td>
                     <div class="small-song-icon">
@@ -135,7 +135,7 @@
                    .find('i.play-song').hide();
     });
 
-// deal with song_change_playlist
+// song_change_playlist
     <!--$('a.song_change_playlist').on('click', function(e){-->
         <!--var url = $(this).attr('href'),-->
             <!--$body = $('body');-->
@@ -154,6 +154,13 @@
             <!--});-->
         <!--};-->
     <!--});-->
+
+// delete song from playlist
+    $('a.song_delete_playlist').on('click', function(e){
+        var $this = $(this);
+        e.preventDefault();
+    });
+
 
 // re-order the songs
     <!--$('tbody#sort-table').sortable({-->

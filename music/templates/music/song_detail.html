@@ -35,7 +35,7 @@
                     <i class="fa fa-plus fa-15x">新增</i>
                     <ul class="dropdown">
                         <li class="song-add-queue">加入播放佇列</li>
-                        <li class="song-add-songlist">加入歌單</li>
+                        <li class="song-add-playlist">加入歌單</li>
                     </ul>
                 </div>
                 <table class="no-border">
@@ -219,6 +219,44 @@
             },
             error: function(){ alert('錯誤') }
         });
+    });
+
+// song add playlist
+    $('li.song-add-playlist').on('click', function(e){
+        var $this = $(this),
+            $body = $('body'),
+            url = "{% url 'music:playlist_add' 'song' '00000' %}".replace('00000', song_id);
+
+        $this.parent().css('visibility', 'hidden');
+
+        $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
+        $('<div></div>', { 'id': 'fixed-center' })
+                        .load(url, popOutActivate).prependTo($body);
+
+        function popOutActivate() {
+            var $popOutDiv = $(this),
+                $popOutCover = $popOutDiv.next('#popout-black-cover'),
+                cancelButton = $popOutDiv.find('button[type=button]'),
+                form = $popOutDiv.find('form');
+
+            cancelButton.on('click', function(){
+                $popOutDiv.remove();
+                $popOutCover.remove();
+            });
+            form.on('submit', function(e){
+                $.ajax({
+                    type: "POST",
+                    'url': url,
+                    data: form.serialize(),
+                    success: function(data){
+                        $popOutDiv.remove();
+                        $popOutCover.remove();
+                    },
+                    error: function(){ alert('錯誤') }
+                });
+                e.preventDefault();
+            });
+        };
     });
 
 
