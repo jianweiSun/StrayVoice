@@ -108,3 +108,52 @@ class AlbumLikeShip(models.Model):
 
     class Meta:
         unique_together = ("user", "album")
+
+
+class Playlist(models.Model):
+    PUBLISHED_CHOICES = [(True, '公開'),
+                         (False, '隱藏')]
+    user = models.ForeignKey(User, related_name='playlists')
+    name = models.CharField(max_length=30)
+    description = models.TextField(max_length=500, blank=True)
+    cover = models.ImageField(upload_to='images/playlist_cover/%Y/%m/%d', blank=True)
+    published = models.BooleanField(choices=PUBLISHED_CHOICES, default=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    songs = models.ManyToManyField(Song, through='PlaylistSongsShip', related_name='playlists')
+    liked_by = models.ManyToManyField(User, through='PlaylistLikeShip', related_name='like_playlists')
+    total_likes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        # if playlist have cover, delete the old one
+        try:
+            this = Playlist.objects.get(id=self.id)
+            if this.cover and this.cover != self.cover:
+                this.cover.delete(save=False)
+        # if new playlist, do nothing
+        except Playlist.DoesNotExist:
+            pass
+        super(Playlist, self).save()
+
+
+class PlaylistLikeShip(models.Model):
+    user = models.ForeignKey(User)
+    playlist = models.ForeignKey(Playlist)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return '{} likes {}'.format(self.user, self.playlist)
+
+    class Meta:
+        unique_together = ("user", "playlist")
+
+
+class PlayListSongsShip(models.Model):
+    playlist = models.ForeignKey(Playlist)
+    song = models.ForeignKey(Song)
+    order = OrderField(blank=True, for_fields=['playlist'], db_index=True)
+
+    def __str__(self):
+        return '{} contains {}'.format(self.playlist, self.song)
