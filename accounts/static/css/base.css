@@ -128,7 +128,7 @@ div#login-box {
     margin-right: 100px;
 }
 
-div#login-box p {;
+div#login-box p {
     clear: both;
 }
 
@@ -344,7 +344,7 @@ div.profile-right-half {
     padding: 20px 30px;
     box-sizing: border-box;
     height: 170px;
-    width: 100%:
+    width: 100%;
 }
 
 
@@ -977,13 +977,14 @@ ul.filter-content li.selected {
 /* ------ song-box --------*/
 
 div#songs-box {
-    overflow: auto;
+    overflow: visible;
 }
 
 div.song-box {
     width: 16.66%;
     float: left;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+    height: 260px;
 }
 /* copy from SV */
 .text-ellipsis {

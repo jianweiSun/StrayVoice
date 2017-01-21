@@ -207,37 +207,36 @@
 
 
 // re-order the songs
-    <!--$('tbody#sort-table').sortable({-->
-        <!--stop: function(event, ui) {-->
-            <!--var $this = $(this),-->
-                <!--song_objects = {};-->
+    $('tbody#sort-table').sortable({
+        stop: function(event, ui) {
+            var $this = $(this),
+                playlistsongsship_obj = {};
 
-            <!--// update data-order and insert into song_objects-->
-            <!--$this.children().each(function(index, item){-->
-                <!--$(item).data('order', index+1);-->
-                <!--song_objects[$(item).data('id')] = index + 1;-->
-            <!--});-->
+            // update data-order and insert into song_objects
+            $this.children().each(function(index, item){
+                playlistsongsship_obj[$(item).data('playlistsongsship_id')] = index + 1;
+            });
 
-            <!--// disable sortable until ajax success-->
-            <!--$this.sortable("disable");-->
+            // disable sortable until ajax success
+            $this.sortable("disable");
 
-            <!--$.ajax({-->
-                <!--type: 'POST',-->
-                <!--headers: {'X-CSRFToken': '{{ csrf_token }}'},-->
-                <!--url: "{% url 'music:album_songs_order' %}",-->
-                <!--contentType: 'application/json; charset=UTF-8;',-->
-                <!--dataType: 'json',-->
-                <!--data: JSON.stringify(song_objects),-->
-                <!--success: function(data){-->
-                    <!--$this.children().each(function(index, item){-->
-                        <!--$(item).find('td').first().html(index+1);-->
-                    <!--});-->
-                    <!--$this.sortable("enable");-->
-                <!--},-->
-                <!--error: function(){ alert('錯誤') }-->
-            <!--});-->
-        <!--}-->
-    <!--});-->
+            $.ajax({
+                type: 'POST',
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                url: "{% url 'music:playlist_songs_order' %}",
+                contentType: 'application/json; charset=UTF-8;',
+                dataType: 'json',
+                data: JSON.stringify(playlistsongsship_obj),
+                success: function(data){
+                    $this.children().each(function(index, item){
+                        $(item).find('td').first().html(index+1);
+                    });
+                    $this.sortable("enable");
+                },
+                error: function(){ alert('錯誤') }
+            });
+        }
+    });
 
 // active play-song button
     $('tr.song-row').find('i.play-song').on('click', function(){

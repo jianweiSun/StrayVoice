@@ -159,7 +159,6 @@
 
             // update data-order and insert into song_objects
             $this.children().each(function(index, item){
-                $(item).data('order', index+1);
                 song_objects[$(item).data('id')] = index + 1;
             });
 

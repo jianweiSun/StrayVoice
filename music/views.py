@@ -205,7 +205,7 @@ class AlbumDeleteView(LoginRequiredMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         default = get_object_or_404(Album, user=request.user, name="未分類專輯")
-        all_songs = self.album.songs.all().order_by('order')
+        all_songs = self.album.songs.order_by('order')
         for song in all_songs:
             # set None to auto-set the order, maybe there're better ways
             song.album = default
@@ -220,7 +220,7 @@ class AlbumDetailView(TemplateResponseMixin, View):
     def get(self, request, username, album_id):
         owner = get_object_or_404(User, username=username)
         album = get_object_or_404(Album, user=owner, id=album_id)
-        songs = album.songs.all().order_by('order')
+        songs = album.songs.order_by('order')
         # don't show default album
         if album.name == '未分類專輯':
             return HttpResponseNotFound()
@@ -422,6 +422,19 @@ class PlaylistDeleteView(LoginRequiredMixin, DeleteView):
         return reverse('music:playlist_create')
 
 
+class PlaylistDetailView(TemplateResponseMixin, View):
+    template_name = 'music/playlist_detail.html'
+
+    def get(self, request, username, playlist_id):
+        owner = get_object_or_404(User, username=username)
+        playlist = get_object_or_404(Playlist, user=owner, id=playlist_id)
+        songs = playlist.songs.order_by('playlistsongsship__order')
+
+        return self.render_to_response({'playlist': playlist,
+                                        'songs': songs})
+
+
+@method_decorator(ajax_required, name='dispatch')
 class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
     template_name = 'music/manage/playlist_add_songs.html'
 
@@ -432,7 +445,11 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
 
         if model_type == 'song':
             self.song = get_object_or_404(Song, id=id)
-            return super(PlaylistAddSongsView, self).dispatch(request, *args, model_type, id, **kwargs)
+        elif model_type == 'album':
+            self.album = get_object_or_404(Album, id=id)
+        else:
+            self.playlist = get_object_or_404(Playlist, id=id)
+        return super(PlaylistAddSongsView, self).dispatch(request, *args, model_type, id, **kwargs)
 
     def get(self, request, model_type, id):
         if not request.user.playlists.all():
@@ -449,6 +466,13 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
             playlist = form.cleaned_data['playlist']
             if model_type == 'song':
                 PlayListSongsShip.objects.create(playlist=playlist, song=self.song)
+            elif model_type == 'album':
+                # maybe can use bulk_create or transaction to improve performance
+                for song in self.album.songs.order_by('order'):
+                    PlayListSongsShip.objects.create(playlist=playlist, song=song)
+            else:
+                for song in self.playlist.songs.order_by('playlistsongsship__order'):
+                    PlayListSongsShip.objects.create(playlist=playlist, song=song)
             return JsonResponse({'saved': 'OK'})
         else:
             return HttpResponseForbidden()
@@ -463,6 +487,7 @@ class PlaylistDeleteSongView(LoginRequiredMixin, View):
         return JsonResponse({'saved': 'OK'})
 
 
+@method_decorator(ajax_required, name='dispatch')
 class SongChangePlaylistView(LoginRequiredMixin, TemplateResponseMixin, View):
     template_name = 'music/manage/playlist_add_songs.html'
 
@@ -488,3 +513,11 @@ class SongChangePlaylistView(LoginRequiredMixin, TemplateResponseMixin, View):
         else:
             return HttpResponseForbidden()
 
+
+@method_decorator(ajax_required, name='dispatch')
+class PlaylistSongsOrderView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        for id, new_order in json.loads(request.body.decode()).items():
+            PlayListSongsShip.objects.filter(id=id).update(order=new_order)
+        return JsonResponse({'saved': 'OK'})

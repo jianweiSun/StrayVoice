@@ -229,12 +229,25 @@
 
         $this.parent().css('visibility', 'hidden');
 
-        $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
-        $('<div></div>', { 'id': 'fixed-center' })
-                        .load(url, popOutActivate).prependTo($body);
+        $.ajax({
+            type: "GET",
+            'url': url,
+            dataType: "html",
+            success: function(data, string, xhr){
+                if ($('<div>').html(data).find('div#login-box').length) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
+                    $('<div></div>', { 'id': 'fixed-center' }).html(data).prependTo($body);
+                    popOutActivate();
+                }
+            },
+        });
+
 
         function popOutActivate() {
-            var $popOutDiv = $(this),
+            var $popOutDiv = $('div#fixed-center'),
                 $popOutCover = $popOutDiv.next('#popout-black-cover'),
                 cancelButton = $popOutDiv.find('button[type=button]'),
                 form = $popOutDiv.find('form');

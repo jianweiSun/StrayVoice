@@ -4,49 +4,49 @@
 {% load music_tags %}
 
 {% block title %}
-    {{ album.name }} - {{ album.user.profile.nickname }} | StrayVoice
+    {{ playlist.name }} - {{ playlist.user.profile.nickname }} | StrayVoice
 {% endblock %}
 
 {% block content %}
 <div id="container">
-    {% show_user_side_bar request album %}
+    {% show_user_side_bar request playlist %}
     <div class="content-container-left">
         <div style="overflow: auto;">
             <div class="wid25 left">
                 <div class="cover-playbtn">
-                    {% if not album.cover %}
+                    {% if not playlist.cover %}
                         <img src="{% static 'img/no_image_photo.png' %}" height="175px" width="175px">
                     {% else %}
-                    {% thumbnail album.cover "175x175" crop="center" as im %}
+                    {% thumbnail playlist.cover "175x175" crop="center" as im %}
                         <img src="{{ im.url }}" height="175px" width="175px">
                     {% endthumbnail %}
                     {% endif %}
-                        <i class="songlist-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
+                        <i class="playlist-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
                 </div>
             </div>
             <div class="wid75 left">
-                <h1>{{ album.name }}</h1>
+                <h1>{{ playlist.name }}</h1>
                 <div class="btns">
-                    {% if album in request.user.like_albums.all %}
-                        <i class="album-like-btn fa fa-heart fa-15x red" style="margin-right: 20px;">&nbsp;{{ album.total_likes }}</i>
+                    {% if playlist in request.user.like_playlists.all %}
+                        <i class="playlist-like-btn fa fa-heart fa-15x red" style="margin-right: 20px;">&nbsp;{{ playlist.total_likes }}</i>
                     {% else %}
-                        <i class="album-like-btn fa fa-heart-o fa-15x" style="margin-right: 20px;">&nbsp;{{ album.total_likes }}</i>
+                        <i class="playlist-like-btn fa fa-heart-o fa-15x" style="margin-right: 20px;">&nbsp;{{ playlist.total_likes }}</i>
                     {% endif %}
                     <i class="fa fa-plus fa-15x">新增</i>
                     <ul class="dropdown">
-                        <li class="album-add-queue">加入播放佇列</li>
-                        <li class="album-add-playlist">加入歌單</li>
+                        <li class="playlist-add-queue">加入播放佇列</li>
+                        <li class="playlist-add-playlist">加入歌單</li>
                     </ul>
                 </div>
                 <table class="no-border">
                     <tr>
                         <th>曲目</th>
-                        <td>{{ album.songs.count }}</td>
+                        <td>{{ playlist.songs.count }}</td>
                     </tr>
                     <tr>
                         <th>發佈</th>
                         <td>
-                            {{ album.created|date:"Y 年 m 月 d 日" }}
+                            {{ playlist.created|date:"Y 年 m 月 d 日" }}
                         </td>
                     </tr>
                 </table>
@@ -118,7 +118,7 @@
                 </table>
             </div>
             <div data-tag="description" style="display: none;">
-                {{ album.description|linebreaks }}
+                {{ playlist.description|linebreaks }}
             </div>
         </div>
     </div>
@@ -127,9 +127,9 @@
 
 {% block domready %}
 
-    var pos = document.URL.indexOf('/album/'),
-        pos_last = document.URL.indexOf('/', pos+7),
-        album_id = document.URL.slice(pos+7, pos_last);
+    var pos = document.URL.indexOf('/playlist/'),
+        pos_last = document.URL.indexOf('/', pos+10),
+        playlist_id = document.URL.slice(pos+10, pos_last);
 
 // tag click
     $('div#tags a').on('click', function(e){
@@ -166,55 +166,55 @@
         });
     });
 
-// handle songlist-play-btn
-    $('i.songlist-play-btn').on('click', function(){
-        var url = "{% url 'playqueue:album_exchange' "00000" %}".replace('00000', album_id);
+<!--// handle songlist-play-btn-->
+    <!--$('i.songlist-play-btn').on('click', function(){-->
+        <!--var url = "{% url 'playqueue:album_exchange' "00000" %}".replace('00000', album_id);-->
 
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "html",
-            success : function(data){
-                $(data).prependTo(audioplayer.playQueue.empty());
-                audioplayer.forwardButton.trigger('click');
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
+        <!--$.ajax({-->
+            <!--type: "GET",-->
+            <!--url: url,-->
+            <!--dataType: "html",-->
+            <!--success : function(data){-->
+                <!--$(data).prependTo(audioplayer.playQueue.empty());-->
+                <!--audioplayer.forwardButton.trigger('click');-->
+            <!--},-->
+            <!--error: function(){ alert('錯誤') }-->
+        <!--});-->
+    <!--});-->
 
-// album-like-btn
-    $('i.album-like-btn').on('click', function(){
-        var $this = $(this),
-            like_num = parseInt($this.text()),
-            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
+<!--// playlist-like-btn-->
+    <!--$('i.album-like-btn').on('click', function(){-->
+        <!--var $this = $(this),-->
+            <!--like_num = parseInt($this.text()),-->
+            <!--action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';-->
 
-        $.ajax({
-            type: "POST",
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            url: "{% url 'music:album_like' %}",
-            data: {
-                'album_id': album_id,
-                'action': action,
-            },
-            success : function(data, string, xhr){
-                var content_type = xhr.getResponseHeader('Content-Type');
-                if (content_type != "application/json" ) {
-                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
-                }
-                else {
-                    if (action == 'like') {
-                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
-                                                       .text(' ' + (like_num+1));
-                    }
-                    else {
-                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
-                                                       .text(' ' + (like_num-1));
-                    }
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
+        <!--$.ajax({-->
+            <!--type: "POST",-->
+            <!--headers: {'X-CSRFToken': '{{ csrf_token }}'},-->
+            <!--url: "{% url 'music:album_like' %}",-->
+            <!--data: {-->
+                <!--'album_id': album_id,-->
+                <!--'action': action,-->
+            <!--},-->
+            <!--success : function(data, string, xhr){-->
+                <!--var content_type = xhr.getResponseHeader('Content-Type');-->
+                <!--if (content_type != "application/json" ) {-->
+                    <!--window.location.href = '/accounts/login/?next=' + window.location.pathname;-->
+                <!--}-->
+                <!--else {-->
+                    <!--if (action == 'like') {-->
+                        <!--$this.removeClass('fa-heart-o').addClass('fa-heart red')-->
+                                                       <!--.text(' ' + (like_num+1));-->
+                    <!--}-->
+                    <!--else {-->
+                        <!--$this.removeClass('fa-heart red').addClass('fa-heart-o')-->
+                                                       <!--.text(' ' + (like_num-1));-->
+                    <!--}-->
+                <!--}-->
+            <!--},-->
+            <!--error: function(){ alert('錯誤') }-->
+        <!--});-->
+    <!--});-->
 
 // follow-btn
     $('button.follow-btn').on('click', function(){
@@ -298,32 +298,32 @@
 
 //
 
-// album add queue
-    $('li.album-add-queue').on('click', function(){
-        var $this = $(this),
-            url = "{% url 'playqueue:album_append' '00000' %}".replace('00000', album_id);
+<!--// playlist add queue-->
+    <!--$('li.album-add-queue').on('click', function(){-->
+        <!--var $this = $(this),-->
+            <!--url = "{% url 'playqueue:album_append' '00000' %}".replace('00000', album_id);-->
 
-        $.ajax({
-            type: "GET",
-            'url': url,
-            dataType: "html",
-            success : function(data){
-                $(data).appendTo(audioplayer.playQueue);
-                $this.parent().css('visibility', 'hidden');
-                if (audioplayer.playQueue.find('li.active').length == 0) {
-                    audioplayer.playQueue.children().first()
-                                         .find('i.queue-play-btn').trigger('click');
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
+        <!--$.ajax({-->
+            <!--type: "GET",-->
+            <!--'url': url,-->
+            <!--dataType: "html",-->
+            <!--success : function(data){-->
+                <!--$(data).appendTo(audioplayer.playQueue);-->
+                <!--$this.parent().css('visibility', 'hidden');-->
+                <!--if (audioplayer.playQueue.find('li.active').length == 0) {-->
+                    <!--audioplayer.playQueue.children().first()-->
+                                         <!--.find('i.queue-play-btn').trigger('click');-->
+                <!--}-->
+            <!--},-->
+            <!--error: function(){ alert('錯誤') }-->
+        <!--});-->
+    <!--});-->
 
-// album add playlist
-    $('li.album-add-playlist').on('click', function(e){
+// playlist add playlist
+    $('li.playlist-add-playlist').on('click', function(e){
         var $this = $(this),
             $body = $('body'),
-            url = "{% url 'music:playlist_add' 'album' '00000' %}".replace('00000', album_id);
+            url = "{% url 'music:playlist_add' 'playlist' '00000' %}".replace('00000', playlist_id);
 
         $this.parent().css('visibility', 'hidden');
 

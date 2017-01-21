@@ -160,3 +160,4 @@ class PlayListSongsShip(models.Model):
 
     def __str__(self):
         return '{} contains {}'.format(self.playlist, self.song)
+
