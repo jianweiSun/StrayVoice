@@ -21,7 +21,9 @@ urlpatterns = [
     url(r'^manage/playlist/create/$', views.PlaylistCreateView.as_view(), name='playlist_create'),
     url(r'^manage/playlist/(?P<playlist_id>\d+)/$', views.PlaylistEditView.as_view(), name='playlist_edit'),
     url(r'^manage/playlist/(?P<playlist_id>\d+)/delete/$', views.PlaylistDeleteView.as_view(), name='playlist_delete'),
-    #url(r'^manage/playlist/delete_song/$', )
+    url(r'^manage/playlist/delete_song/$', views.PlaylistDeleteSongView.as_view(), name='playlist_delete_song'),
+    url(r'^manage/playlist/song_change_playlist/$',
+        views.SongChangePlaylistView.as_view(), name='song_change_playlist'),
     url(r'^playlist/(?P<model_type>\w+)/(?P<id>\d+)/add/$', views.PlaylistAddSongsView.as_view(), name='playlist_add'),
     # browse
     url(r'^(?P<username>\w+)/songs/(?P<song_id>\d+)/',

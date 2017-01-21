@@ -61,7 +61,7 @@
         </thead>
         <tbody id="sort-table">
             {% for song in songs %}
-            <tr class='song-row' data-id="{{ song.id }}" data-order="{{ song.playlist_order }}">
+            <tr class='song-row' data-id="{{ song.id }}" data-playlistsongsship_id="{{ song.playlistsongsship_id }}">
                 <td>{{ forloop.counter }}</td>
                 <td>
                     <div class="small-song-icon">
@@ -136,29 +136,73 @@
     });
 
 // song_change_playlist
-    <!--$('a.song_change_playlist').on('click', function(e){-->
-        <!--var url = $(this).attr('href'),-->
-            <!--$body = $('body');-->
-        <!--e.preventDefault();-->
-        <!--$('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);-->
-        <!--$('<div></div>', { 'id': 'fixed-center' })-->
-                        <!--.load(url, popOutActivate).prependTo($body);-->
+    $('a.song_change_playlist').on('click', function(e){
+        var url = "{% url 'music:song_change_playlist' %}",
+            $song_row = $(this).closest('tr.song-row'),
+            id = $song_row.data('playlistsongsship_id'),
+            $body = $('body');
+        e.preventDefault();
+        $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
+        $('<div></div>', { 'id': 'fixed-center' })
+                        .load(url, popOutActivate).prependTo($body);
 
-        <!--function popOutActivate() {-->
-            <!--var popOutDiv = $(this),-->
-                <!--popOutCover = $(this).next('#popout-black-cover'),-->
-                <!--cancelButton = $(this).find('button[type=button]');-->
-            <!--cancelButton.on('click', function(){-->
-                <!--popOutDiv.remove();-->
-                <!--popOutCover.remove();-->
-            <!--});-->
-        <!--};-->
-    <!--});-->
+        function popOutActivate() {
+            var $popOutDiv = $(this),
+                $popOutCover = $popOutDiv.next('#popout-black-cover'),
+                cancelButton = $popOutDiv.find('button[type=button]'),
+                form = $popOutDiv.find('form');
+
+            cancelButton.on('click', function(){
+                $popOutDiv.remove();
+                $popOutCover.remove();
+            });
+
+            form.on('submit', function(e){
+                var data = form.serializeArray();
+                data.push({ name: 'playlistsongsship_id', value: id });
+
+                $.ajax({
+                    type: "POST",
+                    'url': url,
+                    data: data,
+                    success: function(data){
+                        $popOutDiv.remove();
+                        $popOutCover.remove();
+                        if(data.saved == "OK") {
+                            $song_row.remove();
+                            $('tbody#sort-table').children().each(function(index, item){
+                                $(item).find('td').first().text(index+1);
+                            });
+                        }
+                    },
+                    error: function(){ alert('錯誤') }
+                });
+                e.preventDefault();
+            });
+        };
+    });
 
 // delete song from playlist
     $('a.song_delete_playlist').on('click', function(e){
-        var $this = $(this);
+        var $this = $(this),
+            $song_row = $this.closest('tr.song-row'),
+            id = $song_row.data('playlistsongsship_id');
+
         e.preventDefault();
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'music:playlist_delete_song' %}",
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: { 'playlistsongsship_id': id},
+            success: function(){
+                $song_row.remove();
+                $('tbody#sort-table').children().each(function(index, item){
+                    $(item).find('td').first().text(index+1);
+                });
+            },
+            error: function(){ alert('錯誤') },
+        });
     });
 
 

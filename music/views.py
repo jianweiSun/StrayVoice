@@ -262,11 +262,12 @@ class SongChangeAlbumView(TemplateResponseMixin, LoginRequiredMixin, View):
             prev_album = self.song.album
             album = form.cleaned_data['album']
             # if change album, reset order to None, let OrderField handle it automatically
+            # also , if album is not changed, do nothing
             if prev_album != album:
                 self.song.order = None
-            self.song.album = album
-            self.song.save()
-            return redirect(reverse('music:album_edit', args=[self.song.album.id]))
+                self.song.album = album
+                self.song.save()
+            return redirect(reverse('music:album_edit', args=[prev_album.id]))
         else:
             return HttpResponseForbidden()
 
@@ -367,7 +368,7 @@ class PlaylistEditView(TemplateResponseMixin, LoginRequiredMixin, View):
         self.playlist = get_object_or_404(Playlist, user=request.user, id=playlist_id)
         self.songs = self.playlist.songs\
                                   .order_by('playlistsongsship__order')\
-                                  .annotate(playlist_order=F('playlistsongsship__order'))
+                                  .annotate(playlistsongsship_id=F('playlistsongsship__id'))
         return super(PlaylistEditView, self).dispatch(request, *args, playlist_id, **kwargs)
 
     def get(self, request, playlist_id):
@@ -439,9 +440,7 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
             return self.render_to_response({})
 
         form = PlaylistAddSongsForm(user=request.user)
-
-        return self.render_to_response({'form': form,
-                                        'song': self.song})
+        return self.render_to_response({'form': form})
 
     def post(self, request, model_type, id):
         form = PlaylistAddSongsForm(user=request.user,
@@ -455,15 +454,37 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
             return HttpResponseForbidden()
 
 
+@method_decorator(ajax_required, name='dispatch')
 class PlaylistDeleteSongView(LoginRequiredMixin, View):
 
     def post(self, request):
-        playlist_id = request.POST.get('playlist_id')
-        song_id = request.POST.get('song_id')
-        order = request.POST.get('order')
-
-        playlist = get_object_or_404(Playlist, user=request.user, id=playlist_id)
-        song = get_object_or_404(Song, id=song_id)
-        PlayListSongsShip.objects.filter(playlist=playlist, song=song, order=order).delete()
-
+        id = request.POST.get('playlistsongsship_id')
+        PlayListSongsShip.objects.get(id=id).delete()
         return JsonResponse({'saved': 'OK'})
+
+
+class SongChangePlaylistView(LoginRequiredMixin, TemplateResponseMixin, View):
+    template_name = 'music/manage/playlist_add_songs.html'
+
+    def get(self, request):
+        form = PlaylistAddSongsForm(user=request.user)
+        return self.render_to_response({'form': form})
+
+    def post(self, request):
+        form = PlaylistAddSongsForm(user=request.user,
+                                    data=request.POST)
+        if form.is_valid():
+            new_playlist = form.cleaned_data['playlist']
+            playlistship_id = request.POST.get('playlistsongsship_id')
+            playlistship_obj = PlayListSongsShip.objects.get(id=playlistship_id)
+
+            if playlistship_obj.playlist == new_playlist:
+                return JsonResponse({'saved': 'No'})
+            else:
+                playlistship_obj.order = None
+                playlistship_obj.playlist = new_playlist
+                playlistship_obj.save()
+                return JsonResponse({'saved': 'OK'})
+        else:
+            return HttpResponseForbidden()
+
