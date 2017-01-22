@@ -7,7 +7,11 @@
 {% block nav_head %}
     <ul id="nav-head">
         <li>
-            <a href="{% url 'music:playlist_edit' request.user.playlists.first.id %}">管理歌單</a>
+            {% if request.user.playlists.first %}
+                <a href="{% url 'music:playlist_edit' request.user.playlists.first.id %}">管理歌單</a>
+            {% else %}
+                <a href="{% url 'music:playlist_create' %}">管理歌單</a>
+            {% endif %}
         </li>
         <li class="unactive">
             &nbsp;&nbsp;新增歌單

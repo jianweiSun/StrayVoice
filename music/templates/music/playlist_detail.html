@@ -186,39 +186,39 @@
         });
     });
 
-<!--// playlist-like-btn-->
-    <!--$('i.album-like-btn').on('click', function(){-->
-        <!--var $this = $(this),-->
-            <!--like_num = parseInt($this.text()),-->
-            <!--action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';-->
+// playlist-like-btn
+    $('i.playlist-like-btn').on('click', function(){
+        var $this = $(this),
+            like_num = parseInt($this.text()),
+            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
 
-        <!--$.ajax({-->
-            <!--type: "POST",-->
-            <!--headers: {'X-CSRFToken': '{{ csrf_token }}'},-->
-            <!--url: "{% url 'music:album_like' %}",-->
-            <!--data: {-->
-                <!--'album_id': album_id,-->
-                <!--'action': action,-->
-            <!--},-->
-            <!--success : function(data, string, xhr){-->
-                <!--var content_type = xhr.getResponseHeader('Content-Type');-->
-                <!--if (content_type != "application/json" ) {-->
-                    <!--window.location.href = '/accounts/login/?next=' + window.location.pathname;-->
-                <!--}-->
-                <!--else {-->
-                    <!--if (action == 'like') {-->
-                        <!--$this.removeClass('fa-heart-o').addClass('fa-heart red')-->
-                                                       <!--.text(' ' + (like_num+1));-->
-                    <!--}-->
-                    <!--else {-->
-                        <!--$this.removeClass('fa-heart red').addClass('fa-heart-o')-->
-                                                       <!--.text(' ' + (like_num-1));-->
-                    <!--}-->
-                <!--}-->
-            <!--},-->
-            <!--error: function(){ alert('錯誤') }-->
-        <!--});-->
-    <!--});-->
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'music:playlist_like' %}",
+            data: {
+                'playlist_id': playlist_id,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (content_type != "application/json" ) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    if (action == 'like') {
+                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
+                                                       .text(' ' + (like_num+1));
+                    }
+                    else {
+                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
+                                                       .text(' ' + (like_num-1));
+                    }
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
 
 // follow-btn
     $('button.follow-btn').on('click', function(){
@@ -302,7 +302,7 @@
 
 //
 
-// playlist add queue
+// playlist append queue
     $('li.playlist-add-queue').on('click', function(){
         var $this = $(this),
             url = "{% url 'playqueue:playlist_append' '00000' %}".replace('00000', playlist_id);

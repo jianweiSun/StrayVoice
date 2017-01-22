@@ -129,6 +129,9 @@ class Playlist(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('music:playlist_detail', args=[self.user.username, self.id])
+
     def save(self, *args, **kwargs):
         # if playlist have cover, delete the old one
         try:

@@ -4,7 +4,7 @@ from django.views.generic import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ..forms import PlaylistCreateForm, PlaylistAddSongsForm
 from django.contrib import messages
-from ..models import Album, Song, Playlist, PlayListSongsShip
+from ..models import Album, Song, Playlist, PlayListSongsShip, PlaylistLikeShip
 from django.urls import reverse
 from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse
 from django.utils.decorators import method_decorator
@@ -199,4 +199,24 @@ class PlaylistSongsOrderView(LoginRequiredMixin, View):
     def post(self, request):
         for id, new_order in json.loads(request.body.decode()).items():
             PlayListSongsShip.objects.filter(id=id).update(order=new_order)
+        return JsonResponse({'saved': 'OK'})
+
+
+@method_decorator(ajax_required, name='dispatch')
+class PlaylistLikeView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        playlist_id = request.POST.get('playlist_id')
+        action = request.POST.get('action')
+
+        playlist = get_object_or_404(Playlist, id=playlist_id)
+
+        if action == 'like':
+            PlaylistLikeShip.objects.create(user=request.user, playlist=playlist)
+            playlist.total_likes = playlist.liked_by.count()
+            playlist.save()
+        else:
+            PlaylistLikeShip.objects.filter(user=request.user, playlist=playlist).delete()
+            playlist.total_likes = playlist.liked_by.count()
+            playlist.save()
         return JsonResponse({'saved': 'OK'})

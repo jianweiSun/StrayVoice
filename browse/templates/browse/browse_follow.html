@@ -7,52 +7,52 @@
 
 {% block type_content %}
 <div class="menu">
-            <ul>
-                <li>
-                    {% if order_type == 'recent_followed' %}
-                        <a href="{% url 'browse:browse_all' genre 'latest' %}">所有音樂</a>
-                    {% else %}
-                        <a href="{% url 'browse:browse_all' genre order_type %}">所有音樂</a>
-                    {% endif %}
-                </li>
-                <li>
-                    {% if order_type == 'recent_followed' %}
-                        <a href="{% url 'browse:browse_like' genre 'recent_liked' %}">我的喜歡</a>
-                    {% else %}
-                        <a href="{% url 'browse:browse_like' genre order_type %}">我的喜歡</a>
-                    {% endif %}
-                </li>
-                <li class="selected">
-                    <a href="{% url 'browse:browse_follow' genre order_type %}">我的追蹤</a>
-                </li>
-            </ul>
-        </div>
-        <div class="filter">
-            <div class="filter-title">
-                類型
-            </div>
-            <ul class="filter-content">
-                {% for genre_iter in genre_list %}
-                    <li {% if genre == genre_iter %}class="selected"{% endif %}>
-                        <a href="{% url 'browse:browse_follow' genre_iter order_type %}">
-                            {%  get_genre_name genre_iter %}
-                        </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="filter">
-            <div class="filter-title">
-                排序
-            </div>
-            <ul class="filter-content">
-                {% for type_iter in type_list %}
-                    <li {% if order_type == type_iter %}class="selected"{% endif %}>
-                        <a href="{% url 'browse:browse_follow' genre type_iter %}">
-                            {% get_order_type_name type_iter %}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+    <ul>
+        <li>
+            {% if order_type == 'recent_followed' %}
+                <a href="{% url 'browse:browse_all' genre 'latest' %}">所有音樂</a>
+            {% else %}
+                <a href="{% url 'browse:browse_all' genre order_type %}">所有音樂</a>
+            {% endif %}
+        </li>
+        <li>
+            {% if order_type == 'recent_followed' %}
+                <a href="{% url 'browse:browse_like' genre 'recent_liked' %}">我的喜歡</a>
+            {% else %}
+                <a href="{% url 'browse:browse_like' genre order_type %}">我的喜歡</a>
+            {% endif %}
+        </li>
+        <li class="selected">
+            <a href="{% url 'browse:browse_follow' genre order_type %}">我的追蹤</a>
+        </li>
+    </ul>
+</div>
+<div class="filter">
+    <div class="filter-title">
+        類型
+    </div>
+    <ul class="filter-content">
+        {% for genre_iter in genre_list %}
+            <li {% if genre == genre_iter %}class="selected"{% endif %}>
+                <a href="{% url 'browse:browse_follow' genre_iter order_type %}">
+                    {%  get_genre_name genre_iter %}
+                </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="filter">
+    <div class="filter-title">
+        排序
+    </div>
+    <ul class="filter-content">
+        {% for type_iter in type_list %}
+            <li {% if order_type == type_iter %}class="selected"{% endif %}>
+                <a href="{% url 'browse:browse_follow' genre type_iter %}">
+                    {% get_order_type_name type_iter %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

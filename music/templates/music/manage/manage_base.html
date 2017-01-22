@@ -14,7 +14,11 @@
                     <a href="{% url 'music:un_album_songs' %}">管理音樂</a>
                 </li>
                 <li {% if section == 'playlist_management' %}class="selected"{% endif %}>
-                    <a href="{% url 'music:playlist_edit' request.user.playlists.first.id %}">管理歌單</a>
+                    {% if request.user.playlists.first %}
+                        <a href="{% url 'music:playlist_edit' request.user.playlists.first.id %}">管理歌單</a>
+                    {% else %}
+                        <a href="{% url 'music:playlist_create' %}">管理歌單</a>
+                    {% endif %}
                 </li>
             </ul>
         </div>

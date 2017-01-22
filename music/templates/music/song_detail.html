@@ -21,7 +21,7 @@
                         <img src="{{ im.url }}" height="175px" width="175px">
                     {% endthumbnail %}
                     {% endif %}
-                        <i class="page-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
+                        <i class="song-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
                 </div>
             </div>
             <div class="wid75 left">
@@ -65,7 +65,7 @@
         <hr>
         <div>
             <div class="inline-middle">
-                <i class="page-play-btn fa fa-play-circle fa-4x big-play-btn"></i>
+                <i class="song-play-btn fa fa-play-circle fa-4x big-play-btn"></i>
             </div>
             <div class="inline-middle" style="color: #ff595f; font-size: 1.5em; margin-left: 10px;">播放</div>
         </div>
@@ -105,8 +105,8 @@
         $('div[data-tag=' + tag + ']').show().siblings().hide();
         e.preventDefault();
     });
-// handle page-play-btn
-    $('i.page-play-btn').on('click', function(){
+// handle song-play-btn
+    $('i.song-play-btn').on('click', function(){
         var url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
 
         $.ajax({

@@ -36,5 +36,6 @@ urlpatterns = [
     # ajax like
     url(r'^song_like/$', views.SongLikeView.as_view(), name='song_like'),
     url(r'^album_like/$', views.AlbumLikeView.as_view(), name='album_like'),
+    url(r'^playlist_like/$', views.PlaylistLikeView.as_view(), name='playlist_like'),
 ]
 

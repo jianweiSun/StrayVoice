@@ -29,31 +29,29 @@
                         <img src="{{ im.url }}" height="175px" width="175px">
                     {% endthumbnail %}
                     {% endif %}
-                        <i class="page-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
+                        <i class="song-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
                 </div>
-                <div>
-                    <div class="song-box-title left text-ellipsis">
-                        <a href="{{ song.get_absolute_url }}">
-                            {{ song.name }}
-                        </a>
-                    </div>
-                    <div class="btns left" style="margin-bottom:5px;">
-                        <a href="{% url 'userpage:front_page' song.user.username %}">
-                            {{ song.user.profile.nickname }}
-                        </a>
-                    </div>
-                    <div class="btns left">
-                        {% if song in request.user.like_songs.all %}
-                            <i class="song-like-btn fa fa-heart fa-1x red" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
-                        {% else %}
-                            <i class="song-like-btn fa fa-heart-o fa-1x" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
-                        {% endif %}
-                        <i class="fa fa-plus fa-1x">新增</i>
-                        <ul class="dropdown">
-                            <li class="song-add-queue">加入播放佇列</li>
-                            <li class="song-add-playlist">加入歌單</li>
-                        </ul>
-                    </div>
+                <div class="song-box-title left text-ellipsis">
+                    <a href="{{ song.get_absolute_url }}">
+                        {{ song.name }}
+                    </a>
+                </div>
+                <div class="btns left" style="margin-bottom:5px;">
+                    <a href="{% url 'userpage:front_page' song.user.username %}">
+                        {{ song.user.profile.nickname }}
+                    </a>
+                </div>
+                <div class="btns left">
+                    {% if song in request.user.like_songs.all %}
+                        <i class="song-like-btn fa fa-heart fa-1x red" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
+                    {% else %}
+                        <i class="song-like-btn fa fa-heart-o fa-1x" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
+                    {% endif %}
+                    <i class="fa fa-plus fa-1x">新增</i>
+                    <ul class="dropdown">
+                        <li class="song-add-queue">加入播放佇列</li>
+                        <li class="song-add-playlist">加入歌單</li>
+                    </ul>
                 </div>
             </div>
             {% endfor %}
@@ -88,8 +86,8 @@
 
 {% block domready %}
 
-// handle page-play-btn
-    $('i.page-play-btn').on('click', function(){
+// handle song-play-btn
+    $('i.song-play-btn').on('click', function(){
         var song_id = $(this).closest('div.song-box').data('id'),
             url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
         $.ajax({
@@ -107,7 +105,7 @@
 // handle songlist-play-btn
     $('i.songlist-play-btn').on('click', function(){
         var tmp_array = new Array(),
-            songs = $('div#songs-box').children();
+            songs = $('div#songs-box').children('.song-box');
 
         songs.each(function(index, item){
             var song_id = $(this).data('id');
