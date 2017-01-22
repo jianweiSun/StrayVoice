@@ -1065,3 +1065,8 @@ ul li span.unactive_page {
     padding: 20px 15px;
     opacity: 0.5;
 }
+
+div.description {
+    display: none;
+    line-height: 30px;
+}

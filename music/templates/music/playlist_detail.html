@@ -55,7 +55,7 @@
         <hr>
         <div>
             <div class="inline-middle">
-                <i class="songlist-play-btn fa fa-play-circle fa-4x big-play-btn"></i>
+                <i class="playlist-play-btn fa fa-play-circle fa-4x big-play-btn"></i>
             </div>
             <div class="inline-middle" style="color: #ff595f; font-size: 1.5em; margin-left: 10px;">播放</div>
         </div>
@@ -108,6 +108,10 @@
                                         <i class="song-like-btn fa fa-heart-o fa-1x" style="margin-right: 10px;">&nbsp;{{ song.total_likes }}</i>
                                     {% endif %}
                                     <i class="fa fa-plus fa-1x">新增</i>
+                                    <ul class="dropdown">
+                                        <li class="song-add-queue">加入播放佇列</li>
+                                        <li class="song-add-playlist">加入歌單</li>
+                                    </ul>
                                 </div>
                             </td>
                             <td>{{ song.length }}</td>
@@ -117,7 +121,7 @@
                     </tbody>
                 </table>
             </div>
-            <div data-tag="description" style="display: none;">
+            <div data-tag="description" class="description">
                 {{ playlist.description|linebreaks }}
             </div>
         </div>
@@ -166,21 +170,21 @@
         });
     });
 
-<!--// handle songlist-play-btn-->
-    <!--$('i.songlist-play-btn').on('click', function(){-->
-        <!--var url = "{% url 'playqueue:album_exchange' "00000" %}".replace('00000', album_id);-->
+// handle playlist-play-btn
+    $('i.playlist-play-btn').on('click', function(){
+        var url = "{% url 'playqueue:playlist_exchange' "00000" %}".replace('00000', playlist_id);
 
-        <!--$.ajax({-->
-            <!--type: "GET",-->
-            <!--url: url,-->
-            <!--dataType: "html",-->
-            <!--success : function(data){-->
-                <!--$(data).prependTo(audioplayer.playQueue.empty());-->
-                <!--audioplayer.forwardButton.trigger('click');-->
-            <!--},-->
-            <!--error: function(){ alert('錯誤') }-->
-        <!--});-->
-    <!--});-->
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "html",
+            success : function(data){
+                $(data).prependTo(audioplayer.playQueue.empty());
+                audioplayer.forwardButton.trigger('click');
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
 
 <!--// playlist-like-btn-->
     <!--$('i.album-like-btn').on('click', function(){-->
@@ -298,26 +302,26 @@
 
 //
 
-<!--// playlist add queue-->
-    <!--$('li.album-add-queue').on('click', function(){-->
-        <!--var $this = $(this),-->
-            <!--url = "{% url 'playqueue:album_append' '00000' %}".replace('00000', album_id);-->
+// playlist add queue
+    $('li.playlist-add-queue').on('click', function(){
+        var $this = $(this),
+            url = "{% url 'playqueue:playlist_append' '00000' %}".replace('00000', playlist_id);
 
-        <!--$.ajax({-->
-            <!--type: "GET",-->
-            <!--'url': url,-->
-            <!--dataType: "html",-->
-            <!--success : function(data){-->
-                <!--$(data).appendTo(audioplayer.playQueue);-->
-                <!--$this.parent().css('visibility', 'hidden');-->
-                <!--if (audioplayer.playQueue.find('li.active').length == 0) {-->
-                    <!--audioplayer.playQueue.children().first()-->
-                                         <!--.find('i.queue-play-btn').trigger('click');-->
-                <!--}-->
-            <!--},-->
-            <!--error: function(){ alert('錯誤') }-->
-        <!--});-->
-    <!--});-->
+        $.ajax({
+            type: "GET",
+            'url': url,
+            dataType: "html",
+            success : function(data){
+                $(data).appendTo(audioplayer.playQueue);
+                $this.parent().css('visibility', 'hidden');
+                if (audioplayer.playQueue.find('li.active').length == 0) {
+                    audioplayer.playQueue.children().first()
+                                         .find('i.queue-play-btn').trigger('click');
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
 
 // playlist add playlist
     $('li.playlist-add-playlist').on('click', function(e){
@@ -331,7 +335,82 @@
             type: "GET",
             'url': url,
             success: function(data, string, xhr){
-                if ($('<div>').html(data).find('div#login-box').length) {
+                if ($('<div></div>').html(data).find('div#login-box').length) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
+                    $('<div></div>', { 'id': 'fixed-center' }).html(data).prependTo($body);
+                    popOutActivate();
+                }
+            },
+        });
+
+
+        function popOutActivate() {
+            var $popOutDiv = $('div#fixed-center'),
+                $popOutCover = $popOutDiv.next('#popout-black-cover'),
+                cancelButton = $popOutDiv.find('button[type=button]'),
+                form = $popOutDiv.find('form');
+
+            cancelButton.on('click', function(){
+                $popOutDiv.remove();
+                $popOutCover.remove();
+            });
+            form.on('submit', function(e){
+                $.ajax({
+                    type: "POST",
+                    'url': url,
+                    data: form.serialize(),
+                    success: function(data){
+                        $popOutDiv.remove();
+                        $popOutCover.remove();
+                    },
+                    error: function(){ alert('錯誤') }
+                });
+                e.preventDefault();
+            });
+        };
+    });
+
+
+// song add queue
+    $('li.song-add-queue').on('click', function(){
+        var $this = $(this),
+            song_id = $this.closest('tr.song-row').data('id'),
+            url = "{% url 'playqueue:song_append' '00000' %}".replace('00000', song_id);
+
+        $.ajax({
+            type: "GET",
+            'url': url,
+            dataType: "html",
+            success : function(data){
+                $(data).appendTo(audioplayer.playQueue);
+                $this.parent().css('visibility', 'hidden');
+                if (audioplayer.playQueue.find('li.active').length == 0) {
+                    audioplayer.playQueue.children().first()
+                                         .find('i.queue-play-btn').trigger('click');
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+
+// song add playlist
+    $('li.song-add-playlist').on('click', function(e){
+        var $this = $(this),
+            $body = $('body'),
+            song_id = $this.closest('tr.song-row').data('id'),
+            url = "{% url 'music:playlist_add' 'song' '00000' %}".replace('00000', song_id);
+
+        $this.parent().css('visibility', 'hidden');
+
+        $.ajax({
+            type: "GET",
+            'url': url,
+            success: function(data, string, xhr){
+                // tricky way to handle redirect
+                if ($('<div></div>').html(data).find('div#login-box').length) {
                     window.location.href = '/accounts/login/?next=' + window.location.pathname;
                 }
                 else {

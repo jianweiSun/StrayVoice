@@ -13,6 +13,10 @@ urlpatterns = [
     url(r'^exchange/$', views.PlayQueueExchange.as_view(), name='queue_exchange'),
     url(r'^exchange/album/(?P<album_id>\d+)/',
         views.AlbumSongsExchange.as_view(), name='album_exchange'),
+    url(r'^exchange/playlist/(?P<playlist_id>\d+)/',
+        views.PlaylistSongsExchange.as_view(), name='playlist_exchange'),
     url(r'^album/(?P<album_id>\d+)/append/$',
         views.AlbumSongsAppend.as_view(), name='album_append'),
+    url(r'^playlist/(?P<playlist_id>\d+)/append/$',
+        views.PlaylistSongsAppend.as_view(), name='playlist_append'),
 ]
