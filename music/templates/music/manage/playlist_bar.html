@@ -5,7 +5,12 @@
     <ul class="vertical">
         {% for playlist_item in all_playlists %}
             <li {% if playlist_item == playlist %}class="selected"{% endif %}>
-                <a href="{% url 'music:playlist_edit' playlist_item.id %}">{{ playlist_item.name }}</a>
+                <a href="{% url 'music:playlist_edit' playlist_item.id %}">
+                    {{ playlist_item.name }}
+                    {% if not playlist_item.published %}
+                        <span style="color: red;">(隱藏中)</span>
+                    {% endif %}
+                </a>
             </li>
         {% endfor %}
     </ul>

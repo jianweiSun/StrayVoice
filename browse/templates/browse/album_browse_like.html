@@ -1,4 +1,4 @@
-{% extends 'browse/playlist_base.html' %}
+{% extends 'browse/album_base.html' %}
 {% load music_tags %}
 
 {% block type_title %}
@@ -10,26 +10,26 @@
     <ul>
         <li>
             {% if order_type == 'recent_liked' %}
-                <a href="{% url 'browse:playlist_browse_all' 'latest' %}">所有歌單</a>
+                <a href="{% url 'browse:album_browse_all' 'latest' %}">所有專輯</a>
             {% else %}
-                <a href="{% url 'browse:playlist_browse_all' order_type %}">所有歌單</a>
+                <a href="{% url 'browse:album_browse_all' order_type %}">所有專輯</a>
             {% endif %}
         </li>
         <li>
             {% if order_type == 'recent_liked' %}
-                <a href="{% url 'browse:playlist_browse_mine' 'latest' %}">我的歌單</a>
+                <a href="{% url 'browse:album_browse_mine' 'latest' %}">我的專輯</a>
             {% else %}
-                <a href="{% url 'browse:playlist_browse_mine' order_type %}">我的歌單</a>
+                <a href="{% url 'browse:album_browse_mine' order_type %}">我的專輯</a>
             {% endif %}
         </li>
         <li class="selected">
-            <a href="{% url 'browse:playlist_browse_like' order_type %}">我的喜歡</a>
+            <a href="{% url 'browse:album_browse_like' order_type %}">我的喜歡</a>
         </li>
         <li>
             {% if order_type == 'recent_liked' %}
-                <a href="{% url 'browse:playlist_browse_follow' 'recent_followed' %}">我的追蹤</a>
+                <a href="{% url 'browse:album_browse_follow' 'recent_followed' %}">我的追蹤</a>
             {% else %}
-                <a href="{% url 'browse:playlist_browse_follow' order_type %}">我的追蹤</a>
+                <a href="{% url 'browse:album_browse_follow' order_type %}">我的追蹤</a>
             {% endif %}
         </li>
     </ul>
@@ -41,7 +41,7 @@
     <ul class="filter-content">
         {% for type_iter in type_list %}
         <li {% if type_iter == order_type %}class="selected"{% endif %}>
-            <a href="{% url 'browse:playlist_browse_like' type_iter %}">
+            <a href="{% url 'browse:album_browse_like' type_iter %}">
                 {% get_order_type_name type_iter %}
             </a>
         </li>

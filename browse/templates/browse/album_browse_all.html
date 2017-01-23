@@ -1,24 +1,24 @@
-{% extends 'browse/playlist_base.html' %}
+{% extends 'browse/album_base.html' %}
 {% load music_tags %}
 
 {% block type_title %}
-    {% get_order_type_name order_type %} - 所有歌單
+    {% get_order_type_name order_type %} - 所有專輯
 {% endblock %}
 
 {% block type_content %}
 <div class="menu">
     <ul>
         <li class="selected">
-            <a href="{% url 'browse:playlist_browse_all' order_type %}">所有歌單</a>
+            <a href="{% url 'browse:album_browse_all' order_type %}">所有專輯</a>
         </li>
         <li>
-            <a href="{% url 'browse:playlist_browse_mine' order_type %}">我的歌單</a>
+            <a href="{% url 'browse:album_browse_mine' order_type %}">我的專輯</a>
         </li>
         <li>
-            <a href="{% url 'browse:playlist_browse_like' order_type %}">我的喜歡</a>
+            <a href="{% url 'browse:album_browse_like' order_type %}">我的喜歡</a>
         </li>
         <li>
-            <a href="{% url 'browse:playlist_browse_follow' order_type %}">我的追蹤</a>
+            <a href="#">我的追蹤</a>
         </li>
     </ul>
 </div>
@@ -29,7 +29,7 @@
     <ul class="filter-content">
         {% for type_iter in type_list %}
         <li {% if type_iter == order_type %}class="selected"{% endif %}>
-            <a href="{% url 'browse:playlist_browse_all' type_iter %}">
+            <a href="{% url 'browse:album_browse_all' type_iter %}">
                 {% get_order_type_name type_iter %}
             </a>
         </li>

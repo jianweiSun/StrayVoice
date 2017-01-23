@@ -27,6 +27,9 @@ class AlbumCreateView(TemplateResponseMixin, LoginRequiredMixin, View):
     def post(self, request):
         form = AlbumCreateForm(data=request.POST,
                                files=request.FILES)
+        all_albums = Album.objects.filter(user=request.user)\
+                                  .exclude(name__contains="未分類專輯")
+
         if form.is_valid():
             album = form.save(commit=False)
             album.user = request.user
@@ -36,7 +39,8 @@ class AlbumCreateView(TemplateResponseMixin, LoginRequiredMixin, View):
         else:
             messages.error(request, '專輯新增失敗')
         return self.render_to_response({'form': form,
-                                        'section': 'music_management'})
+                                        'section': 'music_management',
+                                        'all_albums': all_albums})
 
 
 class AlbumEditView(TemplateResponseMixin, LoginRequiredMixin, View):
@@ -122,7 +126,7 @@ class AlbumDetailView(TemplateResponseMixin, View):
     def get(self, request, username, album_id):
         owner = get_object_or_404(User, username=username)
         album = get_object_or_404(Album, user=owner, id=album_id)
-        songs = album.songs.order_by('order')
+        songs = album.songs.filter(published=True).order_by('order')
         # don't show default album
         if album.name == '未分類專輯':
             return HttpResponseNotFound()

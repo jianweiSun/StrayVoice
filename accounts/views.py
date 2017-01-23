@@ -9,7 +9,7 @@ from django.views.generic.base import View, TemplateResponseMixin
 from .models import Profile, FollowShip
 from userpage.models import FrontPageContent
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponseNotFound
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.views import _get_login_redirect_url
 from music.models import Album
 from playqueue.decorators import ajax_required
@@ -175,7 +175,7 @@ class UserFollowView(LoginRequiredMixin, View):
         profile = request.user.profile
         # prevent users follow themselves
         if profile_to == profile:
-            return HttpResponseNotFound()
+            return HttpResponseBadRequest()
 
         if action == 'follow':
             FollowShip.objects.create(profile_from=profile, profile_to=profile_to)

@@ -106,7 +106,10 @@ class PlaylistDetailView(TemplateResponseMixin, View):
 
     def get(self, request, username, playlist_id):
         owner = get_object_or_404(User, username=username)
-        playlist = get_object_or_404(Playlist, user=owner, id=playlist_id)
+        if request.user == owner:
+            playlist = get_object_or_404(Playlist, user=owner, id=playlist_id)
+        else:
+            playlist = get_object_or_404(Playlist, user=owner, id=playlist_id, published=True)
         songs = playlist.songs.order_by('playlistsongsship__order')
 
         return self.render_to_response({'playlist': playlist,
@@ -123,11 +126,11 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
             return HttpResponseNotFound()
 
         if model_type == 'song':
-            self.song = get_object_or_404(Song, id=id)
+            self.song = get_object_or_404(Song, id=id, published=True)
         elif model_type == 'album':
             self.album = get_object_or_404(Album, id=id)
         else:
-            self.playlist = get_object_or_404(Playlist, id=id)
+            self.playlist = get_object_or_404(Playlist, id=id, published=True)
         return super(PlaylistAddSongsView, self).dispatch(request, *args, model_type, id, **kwargs)
 
     def get(self, request, model_type, id):
@@ -147,7 +150,7 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
                 PlayListSongsShip.objects.create(playlist=playlist, song=self.song)
             elif model_type == 'album':
                 # maybe can use bulk_create or transaction to improve performance
-                for song in self.album.songs.order_by('order'):
+                for song in self.album.songs.filter(published=True).order_by('order'):
                     PlayListSongsShip.objects.create(playlist=playlist, song=song)
             else:
                 for song in self.playlist.songs.order_by('playlistsongsship__order'):

@@ -11,35 +11,6 @@
 <div id="container">
     <div id="content-container-85">
         {% block type_content %}
-            <div class="menu">
-                <ul>
-                    <li>
-                        <a href="#">所有歌單</a>
-                    </li>
-                    <li>
-                        <a href="#">我的歌單</a>
-                    </li>
-                    <li>
-                        <a href="#">我的喜歡</a>
-                    </li>
-                    <li>
-                        <a href="#">我的追蹤</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="filter">
-                <div class="filter-title">
-                    排序
-                </div>
-                <ul class="filter-content">
-                    <li>
-                        <a href="#">最新上傳</a>
-                    </li>
-                    <li>
-                        <a href="#">最多喜歡</a>
-                    </li>
-                </ul>
-            </div>
         {% endblock %}
         <div id="items-box">
             {% for item in items %}
@@ -53,11 +24,14 @@
                     {% endthumbnail %}
                     {% endif %}
                         <i class="item-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
-                        <div class="count-box">{{ item.songs.count }}</div>
+                        <div class="count-box">{{ item.songs_number }}</div>
                 </div>
                 <div class="item-box-title left text-ellipsis">
                     <a href="{{ item.get_absolute_url }}">
                         {{ item.name }}
+                        {% if item.published == False %}
+                            <span style="color: red;">(隱藏中)</span>
+                        {% endif %}
                     </a>
                 </div>
                 <div class="btns left" style="margin-bottom:5px;">
@@ -74,7 +48,9 @@
                     <i class="fa fa-plus fa-1x">新增</i>
                     <ul class="dropdown">
                         <li class="item-add-queue">加入播放佇列</li>
-                        <li class="item-add-playlist">加入歌單</li>
+                        {% if not item.published == False %}
+                            <li class="item-add-playlist">加入歌單</li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -110,7 +86,6 @@
 
 {% block domready %}
 
-    {% block domready_overwrite %}
     // playlist-play-btn
         $('i.item-play-btn').on('click', function(){
             var playlist_id = $(this).closest('div.item-box').data('id'),
@@ -249,6 +224,5 @@
                 });
             };
         });
-    {% endblock %}
 
 {% endblock %}

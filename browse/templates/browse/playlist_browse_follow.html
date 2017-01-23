@@ -2,35 +2,35 @@
 {% load music_tags %}
 
 {% block type_title %}
-    {% get_order_type_name order_type %} - 我的喜歡
+    {% get_order_type_name order_type %} - 我的追蹤
 {% endblock %}
 
 {% block type_content %}
 <div class="menu">
     <ul>
         <li>
-            {% if order_type == 'recent_liked' %}
+            {% if order_type == 'recent_followed' %}
                 <a href="{% url 'browse:playlist_browse_all' 'latest' %}">所有歌單</a>
             {% else %}
                 <a href="{% url 'browse:playlist_browse_all' order_type %}">所有歌單</a>
             {% endif %}
         </li>
         <li>
-            {% if order_type == 'recent_liked' %}
+            {% if order_type == 'recent_followed' %}
                 <a href="{% url 'browse:playlist_browse_mine' 'latest' %}">我的歌單</a>
             {% else %}
                 <a href="{% url 'browse:playlist_browse_mine' order_type %}">我的歌單</a>
             {% endif %}
         </li>
-        <li class="selected">
-            <a href="{% url 'browse:playlist_browse_like' order_type %}">我的喜歡</a>
-        </li>
         <li>
-            {% if order_type == 'recent_liked' %}
-                <a href="{% url 'browse:playlist_browse_follow' 'recent_followed' %}">我的追蹤</a>
+            {% if order_type == 'recent_followed' %}
+                <a href="{% url 'browse:playlist_browse_like' 'recent_liked' %}">我的喜歡</a>
             {% else %}
-                <a href="{% url 'browse:playlist_browse_follow' order_type %}">我的追蹤</a>
+                <a href="{% url 'browse:playlist_browse_like' order_type %}">我的喜歡</a>
             {% endif %}
+        </li>
+        <li class="selected">
+            <a href="{% url 'browse:playlist_browse_follow' order_type %}">我的追蹤</a>
         </li>
     </ul>
 </div>
@@ -41,7 +41,7 @@
     <ul class="filter-content">
         {% for type_iter in type_list %}
         <li {% if type_iter == order_type %}class="selected"{% endif %}>
-            <a href="{% url 'browse:playlist_browse_like' type_iter %}">
+            <a href="{% url 'browse:playlist_browse_follow' type_iter %}">
                 {% get_order_type_name type_iter %}
             </a>
         </li>

@@ -25,7 +25,12 @@
                 </div>
             </div>
             <div class="wid75 left">
-                <h1>{{ song.name }}</h1>
+                <h1>
+                    {{ song.name }}
+                    {% if not song.published %}
+                    <span style="color: red;">(隱藏中)</span>
+                    {% endif %}
+                </h1>
                 <div class="btns">
                     {% if song in request.user.like_songs.all %}
                         <i class="song-like-btn fa fa-heart fa-15x red" style="margin-right: 20px;">&nbsp;{{ song.total_likes }}</i>
@@ -35,7 +40,9 @@
                     <i class="fa fa-plus fa-15x">新增</i>
                     <ul class="dropdown">
                         <li class="song-add-queue">加入播放佇列</li>
-                        <li class="song-add-playlist">加入歌單</li>
+                        {% if song.published %}
+                            <li class="song-add-playlist">加入歌單</li>
+                        {% endif %}
                     </ul>
                 </div>
                 <table class="no-border">
@@ -80,7 +87,7 @@
             </ul>
         </div>
         <div>
-            <div data-tag="lyrics">
+            <div data-tag="lyrics" class="description">
                 {{ song.lyrics|linebreaks }}
             </div>
             <div data-tag="description" class="description">

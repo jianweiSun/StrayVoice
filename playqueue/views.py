@@ -69,7 +69,7 @@ class AlbumSongsExchange(TemplateResponseMixin, View):
 
     def get(self, request, album_id):
         album = get_object_or_404(Album, id=album_id)
-        ids_lists = list(album.songs.order_by('order').values_list('id', flat=True))
+        ids_lists = list(album.songs.filter(published=True).order_by('order').values_list('id', flat=True))
         queue = PlayQueue(request)
         queue.exchange(ids_lists)
         return self.render_to_response({'songs': queue})
@@ -81,8 +81,8 @@ class AlbumSongsAppend(TemplateResponseMixin, View):
 
     def get(self, request, album_id):
         album = get_object_or_404(Album, id=album_id)
-        album_songs = album.songs.order_by('order')
-        ids_lists = list(album.songs.order_by('order').values_list('id', flat=True))
+        album_songs = album.songs.filter(published=True).order_by('order')
+        ids_lists = list(album.songs.filter(published=True).order_by('order').values_list('id', flat=True))
         queue = PlayQueue(request)
         queue.extend(ids_lists)
         return self.render_to_response({'songs': album_songs})

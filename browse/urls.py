@@ -14,4 +14,15 @@ urlpatterns = [
         , views.PlaylistBrowseMineView.as_view(), name='playlist_browse_mine'),
     url(r'^playlists/like/(?P<order_type>\w+)/$'
         , views.PlaylistBrowseLikeView.as_view(), name='playlist_browse_like'),
+    url(r'^playlists/follow/(?P<order_type>\w+)/$'
+        , views.PlaylistBrowseFollowView.as_view(), name='playlist_browse_follow'),
+    # albums
+    url(r'^albums/general/(?P<order_type>\w+)/$'
+        , views.AlbumBrowseAllView.as_view(), name='album_browse_all'),
+    url(r'^albums/mine/(?P<order_type>\w+)/$'
+        , views.AlbumBrowseMineView.as_view(), name='album_browse_mine'),
+    url(r'^albums/like/(?P<order_type>\w+)/$'
+        , views.AlbumBrowseLikeView.as_view(), name='album_browse_like'),
+    url(r'^albums/follow/(?P<order_type>\w+)/$'
+        , views.AlbumBrowseFollowView.as_view(), name='album_browse_follow'),
 ]

@@ -15,8 +15,8 @@
 		<div id="logo"><a href="{% url 'userpage:tmp_homepage' %}">Strayvoice</a></div>
 		<ul class="left">
 			<li><a href="{% url 'userpage:tmp_homepage' %}">首頁</a></li>
-			<li><a href="#">排行榜</a></li>
-			<li><a href="#">歌單</a></li>
+			<li><a href="{% url 'browse:album_browse_all' 'latest' %}">專輯</a></li>
+			<li><a href="{% url 'browse:playlist_browse_all' 'latest' %}">歌單</a></li>
 			<li><a href="{% url 'browse:browse_all' 'all' 'latest' %}">音樂瀏覽</a></li>
 			<li><a href="#">徵選</a></li>
 		</ul>

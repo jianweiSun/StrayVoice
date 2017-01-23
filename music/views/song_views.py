@@ -105,7 +105,11 @@ class SongDetailView(TemplateResponseMixin, View):
 
     def get(self, request, username, song_id):
         owner = get_object_or_404(User, username=username)
-        song = get_object_or_404(Song, user=owner, id=song_id)
+        # only song owner could see un-published song
+        if request.user == owner:
+            song = get_object_or_404(Song, user=owner, id=song_id)
+        else:
+            song = get_object_or_404(Song, user=owner, id=song_id, published=True)
         return self.render_to_response({'song': song})
 
 
