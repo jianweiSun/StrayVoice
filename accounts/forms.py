@@ -24,9 +24,6 @@ class RegistrationForm(forms.ModelForm):
         email.required = True
         email.label_suffix = ' '
         username.label_suffix = ' '
-        # doesn't work
-        # username.min_length = 6
-        # username.max_length = 30
 
     def clean_password2(self):
         cd = self.cleaned_data

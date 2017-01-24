@@ -186,3 +186,14 @@ class UserFollowView(LoginRequiredMixin, View):
             profile_to.total_likes = profile_to.followers.count()
             profile_to.save()
         return JsonResponse({'saved': 'OK'})
+
+
+class NotificationsView(LoginRequiredMixin, TemplateResponseMixin, View):
+    template_name = 'accounts/notifications.html'
+
+    def get(self, request):
+        followship_objs = FollowShip.objects.filter(profile_to=request.user.profile) \
+                                    .order_by('-created').select_related('profile_from')
+        return self.render_to_response({'followship_objs': followship_objs})
+
+

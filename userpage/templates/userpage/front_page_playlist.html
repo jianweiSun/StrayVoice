@@ -1,0 +1,231 @@
+{% extends 'userpage/front_page_base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load music_tags %}
+
+{% block section_title %}
+    歌單
+{% endblock %}
+
+{% block section_content %}
+<div class="filter">
+    <div class="filter-title">
+        排序
+    </div>
+    <ul class="filter-content">
+        {% for type_iter in type_list %}
+        <li {% if type_iter == order_type %}class="selected"{% endif %}>
+            <a href="{% url 'userpage:front_page_playlist' user.username type_iter %}">
+                {% get_order_type_name type_iter %}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div id="items-box">
+    {% for playlist in playlists %}
+    <div class="item-box" data-id="{{ playlist.id }}" style="height: 300px">
+        <div class="cover-playbtn">
+            {% if not playlist.cover %}
+                <img src="{% static 'img/no_image_photo.png' %}" height="200px" width="200px">
+            {% else %}
+            {% thumbnail playlist.cover "200x200" crop="center" as im %}
+                <img src="{{ im.url }}" height="200px" width="200px">
+            {% endthumbnail %}
+            {% endif %}
+                <i class="item-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
+                <div class="count-box">{{ playlist.songs_number }}</div>
+        </div>
+        <div class="item-box-title left text-ellipsis">
+            <a href="{{ playlist.get_absolute_url }}">
+                {{ playlist.name }}
+            </a>
+        </div>
+        <div class="btns left" style="margin-bottom:5px;">
+            <a href="{% url 'userpage:front_page' user.username %}">
+                {{ playlist.user.profile.nickname }}
+            </a>
+        </div>
+        <div class="btns left">
+            {% if playlist in request.user.like_playlists.all %}
+                <i class="item-like-btn fa fa-heart fa-1x red" style="margin-right: 10px;">&nbsp;{{ playlist.total_likes }}</i>
+            {% else %}
+                <i class="item-like-btn fa fa-heart-o fa-1x" style="margin-right: 10px;">&nbsp;{{ playlist.total_likes }}</i>
+            {% endif %}
+            <i class="fa fa-plus fa-1x">新增</i>
+            <ul class="dropdown">
+                <li class="item-add-queue">加入播放佇列</li>
+                <li class="item-add-playlist">加入歌單</li>
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+    <div style="clear: both;"></div>
+</div>
+<ul class="pagination">
+    <li class="step-links">
+        {% if playlists.has_previous %}
+            <a href="?page={{ playlists.previous_page_number }}">上一頁</a>
+        {% else %}
+            <span class="unactive_page">
+                上一頁
+            </span>
+        {% endif %}
+    </li>
+        <li class="current">
+            第  {{ playlists.number }}  頁
+        </li>
+    <li>
+        {% if playlists.has_next %}
+            <a href="?page={{ playlists.next_page_number }}">下一頁</a>
+        {% else %}
+            <span class="unactive_page">
+                下一頁
+            </span>
+        {% endif %}
+    </li>
+</ul>
+{% endblock %}
+
+{% block section_script %}
+
+    // playlist-play-btn
+        $('i.item-play-btn').on('click', function(){
+            var playlist_id = $(this).closest('div.item-box').data('id'),
+                url = "{% url 'playqueue:playlist_exchange' "00000" %}".replace('00000', playlist_id);
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "html",
+                success : function(data){
+                    $(data).prependTo(audioplayer.playQueue.empty());
+                    audioplayer.forwardButton.trigger('click');
+                },
+                error: function(){ alert('錯誤') }
+            });
+        });
+
+    // playlist-like-btn
+        $('i.item-like-btn').on('click', function(){
+            var $this = $(this),
+                like_num = parseInt($this.text()),
+                playlist_id = $(this).closest('div.item-box').data('id'),
+                action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
+
+            $.ajax({
+                type: "POST",
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                url: "{% url 'music:playlist_like' %}",
+                data: {
+                    'playlist_id': playlist_id,
+                    'action': action,
+                },
+                success : function(data, string, xhr){
+                    var content_type = xhr.getResponseHeader('Content-Type');
+                    if (content_type != "application/json" ) {
+                        window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                    }
+                    else {
+                        if (action == 'like') {
+                            $this.removeClass('fa-heart-o').addClass('fa-heart red')
+                                                           .text(' ' + (like_num+1));
+                        }
+                        else {
+                            $this.removeClass('fa-heart red').addClass('fa-heart-o')
+                                                           .text(' ' + (like_num-1));
+                        }
+                    }
+                },
+                error: function(){ alert('錯誤') }
+            });
+        });
+
+    // plus-btn toggle plus menu
+        $('i.fa-plus').on('click', function(){
+            var $this = $(this),
+                $menu = $this.siblings('ul.dropdown');
+
+            if ($menu.css('visibility') == 'hidden') {
+                $menu.css('visibility', 'visible');
+            }
+            else {
+                $menu.css('visibility', 'hidden');
+            }
+        });
+
+    // playlist append queue
+        $('li.item-add-queue').on('click', function(){
+            var $this = $(this),
+                playlist_id = $(this).closest('div.item-box').data('id'),
+                url = "{% url 'playqueue:playlist_append' '00000' %}".replace('00000', playlist_id);
+
+            $.ajax({
+                type: "GET",
+                'url': url,
+                dataType: "html",
+                success : function(data){
+                    $(data).appendTo(audioplayer.playQueue);
+                    $this.parent().css('visibility', 'hidden');
+                    if (audioplayer.playQueue.find('li.active').length == 0) {
+                        audioplayer.playQueue.children().first()
+                                             .find('i.queue-play-btn').trigger('click');
+                    }
+                },
+                error: function(){ alert('錯誤') }
+            });
+        });
+
+    // playlist add playlist
+        $('li.item-add-playlist').on('click', function(e){
+            var $this = $(this),
+                $body = $('body'),
+                playlist_id = $this.closest('div.item-box').data('id'),
+                url = "{% url 'music:playlist_add' 'playlist' '00000' %}".replace('00000', playlist_id);
+
+            $this.parent().css('visibility', 'hidden');
+            console.log(url);
+            $.ajax({
+                type: "GET",
+                'url': url,
+                success: function(data, string, xhr){
+                    // tricky way to handle redirect
+                    if ($('<div></div>').html(data).find('div#login-box').length) {
+                        window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                    }
+                    else {
+                        $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
+                        $('<div></div>', { 'id': 'fixed-center' }).html(data).prependTo($body);
+                        popOutActivate();
+                    }
+                },
+            });
+
+
+            function popOutActivate() {
+                var $popOutDiv = $('div#fixed-center'),
+                    $popOutCover = $popOutDiv.next('#popout-black-cover'),
+                    cancelButton = $popOutDiv.find('button[type=button]'),
+                    form = $popOutDiv.find('form');
+
+                cancelButton.on('click', function(){
+                    $popOutDiv.remove();
+                    $popOutCover.remove();
+                });
+                form.on('submit', function(e){
+                    $.ajax({
+                        type: "POST",
+                        'url': url,
+                        data: form.serialize(),
+                        success: function(data){
+                            $popOutDiv.remove();
+                            $popOutCover.remove();
+                        },
+                        error: function(){ alert('錯誤') }
+                    });
+                    e.preventDefault();
+                });
+            };
+        });
+
+{% endblock %}

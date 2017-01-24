@@ -153,7 +153,7 @@
     });
 
 // table hover-effect
-    $('tbody>tr').hover(function(){
+    $('div[data-tag="songs"] tbody tr').hover(function(){
         $(this).css('background-color', '#e3e3e3')
                .find('i.play-song').show();
     }, function(){

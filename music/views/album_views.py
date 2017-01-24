@@ -126,12 +126,10 @@ class AlbumDetailView(TemplateResponseMixin, View):
     def get(self, request, username, album_id):
         owner = get_object_or_404(User, username=username)
         album = get_object_or_404(Album, user=owner, id=album_id)
-        songs = album.songs.filter(published=True).order_by('order')
         # don't show default album
         if album.name == '未分類專輯':
             return HttpResponseNotFound()
-        return self.render_to_response({'album': album,
-                                        'songs': songs})
+        return self.render_to_response({'album': album})
 
 
 class UnAlbumSongsEditView(TemplateResponseMixin, LoginRequiredMixin, View):

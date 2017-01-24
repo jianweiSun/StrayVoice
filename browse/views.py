@@ -145,7 +145,7 @@ class PlaylistBrowseMineView(LoginRequiredMixin, TemplateResponseMixin, View):
     def get(self, request, order_type):
         # able to browse un-published playlist of yourself
         playlists = Playlist.objects.filter(user=request.user)\
-                                    .annotate(songs_number=Count('songs')).exclude(songs_number=0) \
+                                    .annotate(songs_number=Count('songs')).exclude(songs_number=0)\
                                     .select_related('user__profile')
 
         if order_type == 'latest':
@@ -328,3 +328,15 @@ class AlbumBrowseFollowView(LoginRequiredMixin, TemplateResponseMixin, View):
                                         'order_type': order_type,
                                         'type_list': ['latest', 'most_liked', 'recent_followed']})
 
+
+class SearchView(TemplateResponseMixin, View):
+    template_name = 'browse/search.html'
+
+    def get(self, request):
+        query_str = request.GET.get('q')
+        if query_str:
+            songs = Song.objects.filter(name__icontains=query_str)
+        else:
+            songs = None
+        return self.render_to_response({'query_str': query_str,
+                                        'songs': songs})

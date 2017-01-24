@@ -338,6 +338,7 @@ div#profile form p, div#profile form ul {
 div#profile-right {
     width: 680px;
     float:left;
+    border-left: 1px solid #e3e3e3;
 }
 
 div.profile-right-half {
@@ -539,6 +540,21 @@ div.row-left-25 {
     padding-right: 30px;
 }
 
+div.row-left-30 {
+    float: left;
+    width: 30%;
+    box-sizing: border-box;
+    padding-right: 30px;
+}
+
+div.row-left-70 {
+    float: left;
+    width: 70%;
+    box-sizing: border-box;
+    border-left: 1px solid #e3e3e3;
+    padding-left: 30px;
+}
+
 div.row-right-75 {
     float: left;
     width: 75%;
@@ -598,6 +614,9 @@ td {
 .wid65 {
     width: 65%;
 }
+.wid60 {
+    width: 60%;
+}
 .wid50 {
     width: 50%;
 }
@@ -615,6 +634,9 @@ td {
 }
 .wid25 {
     width: 25%;
+}
+.wid15 {
+    width: 15%;
 }
 .wid10 {
     width: 10%;
@@ -1021,6 +1043,7 @@ div.item-box {
     margin-bottom: 50px;
     padding: 0px 20px;
     box-sizing: border-box;
+    height: 360px;
 }
 
 .item-box-title {
@@ -1107,4 +1130,19 @@ ul li span.unactive_page {
 div.description {
     display: none;
     line-height: 30px;
+}
+
+/* front page about */
+a.btor {
+    font-size: 20px;
+    color: black;
+    cursor: pointer;
+}
+a.btor:hover {
+    color: red;
+}
+
+tr.border-bottom {
+    border-top: 0px;
+    border-bottom: 2px solid #e3e3e3;
 }

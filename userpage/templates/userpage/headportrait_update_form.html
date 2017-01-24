@@ -1,0 +1,16 @@
+{% if form %}
+<form action="{% url 'userpage:front_page' user.username %}" method="post" enctype="multipart/form-data">
+    <ul class="message">
+        <li class="success">選擇檔案更換頭像</li>
+    </ul>
+    {% for field in form %}
+    {% if field.errors %}
+        {{ field.errors }}
+    {% else %}
+        <ul class="errorlist"></ul>
+    {% endif %}
+    <p> {{ field }} </p>
+    {% endfor %}
+    {% csrf_token %}
+</form>
+{% endif %}

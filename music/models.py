@@ -19,6 +19,9 @@ class Album(models.Model):
     def __str__(self):
         return self.name
 
+    def get_published_songs(self):
+        return self.songs.filter(published=True).order_by('order')
+
     def get_absolute_url(self):
         return reverse('music:album_detail', args=[self.user.username, self.id])
 

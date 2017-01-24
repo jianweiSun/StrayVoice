@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+
+{% block title %} 通知 | Strayvoice {% endblock %}
+
+{% block content %}
+<div id="container" class="gray">
+    <div id="content-container-85">
+        <div class="row">
+            <div class="menu">
+                <ul>
+                    <li class="selected">
+                        <a href="#">
+                            通知
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <table>
+                {% for followship in followship_objs %}
+                    <tr class="border-bottom">
+                        <td>
+                            <div class="inline-middle">
+                                {% if not followship.profile_from.user.frontpagecontent.head_portrait %}
+                                    <img class="round" src="{% static 'img/default_head_portrait_big.jpeg' %}" height="60px" width="60px">
+                                {% else %}
+                                {% thumbnail followship.profile_from.user.frontpagecontent.head_portrait "60x60" crop="center" as im %}
+                                    <img class="round" src="{{ im.url }}" height="60px" width="60px">
+                                {% endthumbnail %}
+                                {% endif %}
+                            </div>
+                            <div class="inline-middle" style="margin-left: 10px;">
+                                <a class="btor" href="{% url 'userpage:front_page' followship.profile_to.user.username %}">
+                                    {{ followship.profile_from.nickname }} 訂閱了你
+                                </a>
+                                <br>
+                                <span style="font-size: 15px; color: #888;">於{{ followship.created|timesince}}前</span>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

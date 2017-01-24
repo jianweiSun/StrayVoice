@@ -1,0 +1,102 @@
+{% extends 'userpage/front_page_base.html' %}
+{% load static %}
+{% load thumbnail %}
+
+{% block section_title %}
+    關於 - 追蹤名單
+{% endblock %}
+
+{% block section_content %}
+<div class="row">
+    <div class="row-left-30">
+        <ul class="vertical">
+            <li class="selected" style="font-size: 20px;">
+                <a href="{% url 'userpage:front_page_about_followings' user.username %}">
+                    追蹤名單
+                </a>
+            </li>
+            <li style="font-size: 20px;">
+                <a href="{% url 'userpage:front_page_about_followers' user.username %}">
+                    粉絲
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="row-left-70">
+        <table>
+            <thead>
+                <tr>
+                    <td style="font-size: 1.5em; line-height:80px; width: 80%;">追蹤名單</td>
+                    <td class="wid20"></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in followings %}
+                    <tr>
+                        <td>
+                            <div class="inline-middle">
+                                {% if not profile.user.frontpagecontent.head_portrait %}
+                                    <img class="round" src="{% static 'img/default_head_portrait_big.jpeg' %}" height="60px" width="60px">
+                                {% else %}
+                                {% thumbnail profile.user.frontpagecontent.head_portrait "60x60" crop="center" as im %}
+                                    <img class="round" src="{{ im.url }}" height="60px" width="60px">
+                                {% endthumbnail %}
+                                {% endif %}
+                            </div>
+                            <div class="inline-middle">
+                                <a class="btor" href="{% url 'userpage:front_page' profile.user.username %}">
+                                    {{ profile.nickname }}
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            {% if request.user != profile.user %}
+                                {% if profile in request.user.profile.followings.all %}
+                                    <button class="row-follow-btn followed" type="button" data-username="{{ profile.user.username }}">已追蹤</button>
+                                {% else %}
+                                    <button class="row-follow-btn" type="button" data-username="{{ profile.user.username }}">追蹤</button>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block section_script %}
+
+// follow-btn
+    $('button.row-follow-btn').on('click', function(){
+        var $this = $(this),
+            username = $this.data('username'),
+            action = $this.hasClass('followed') ? 'unfollow' : 'follow' ;
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            url: "{% url 'user_follow' %}",
+            data: {
+                'username': username,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (content_type != "application/json" ) {
+                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                }
+                else {
+                    if (action == 'follow') {
+                        $this.addClass('followed').text('已追蹤');
+                    }
+                    else {
+                        $this.removeClass('followed').text('追蹤');
+                    }
+                }
+            },
+            error: function(){ alert('錯誤') }
+        });
+    });
+{% endblock %}

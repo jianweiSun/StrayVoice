@@ -22,14 +22,14 @@
                 <a href="{% url 'browse:album_browse_mine' order_type %}">我的專輯</a>
             {% endif %}
         </li>
-        <li class="selected">
+        <li>
             {% if order_type == 'recent_followed' %}
                 <a href="{% url 'browse:album_browse_like' 'recent_liked' %}">我的喜歡</a>
             {% else %}
                 <a href="{% url 'browse:album_browse_like' order_type %}">我的喜歡</a>
             {% endif %}
         </li>
-        <li>
+        <li class="selected">
             <a href="{% url 'browse:album_browse_follow' order_type %}">我的追蹤</a>
         </li>
     </ul>

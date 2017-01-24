@@ -25,4 +25,6 @@ urlpatterns = [
         , views.AlbumBrowseLikeView.as_view(), name='album_browse_like'),
     url(r'^albums/follow/(?P<order_type>\w+)/$'
         , views.AlbumBrowseFollowView.as_view(), name='album_browse_follow'),
+    # search
+    url(r'^search/$', views.SearchView.as_view(), name='search'),
 ]

@@ -1,4 +1,5 @@
 from django import template
+from userpage.forms import HeadPortraitUpdateForm
 
 register = template.Library()
 
@@ -41,3 +42,17 @@ def get_order_type_name(type_iter):
                  'recent_liked': '近期喜歡', 'recent_followed': '近期追蹤'}
     return type_dict[type_iter]
 
+
+@register.simple_tag
+def get_published_songs_number(user):
+    return user.songs.filter(published=True).count()
+
+
+@register.inclusion_tag('userpage/headportrait_update_form.html')
+def get_user_head_portrait_form(request, user):
+    if request.user == user:
+        form = HeadPortraitUpdateForm(instance=request.user.frontpagecontent)
+    else:
+        form = None
+    return {'form': form,
+            'user': user}

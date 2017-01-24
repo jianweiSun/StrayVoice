@@ -150,7 +150,7 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
                 PlayListSongsShip.objects.create(playlist=playlist, song=self.song)
             elif model_type == 'album':
                 # maybe can use bulk_create or transaction to improve performance
-                for song in self.album.songs.filter(published=True).order_by('order'):
+                for song in self.album.get_published_songs():
                     PlayListSongsShip.objects.create(playlist=playlist, song=song)
             else:
                 for song in self.playlist.songs.order_by('playlistsongsship__order'):
