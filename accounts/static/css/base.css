@@ -58,22 +58,16 @@ ul>li>a>i {
     vertical-align: middle;
 }
 
-div#nav ul>img {
+div#nav ul li img {
     vertical-align: middle;
     height: 50px;
     width: 50px;
     border-radius: 50%;
-}
-
-div#nav ul>img {
-    vertical-align: middle;
-    height: 50px;
-    width: 50px;
-    border-radius: 50%;
+    cursor: pointer;
     border: 2px solid transparent;
 }
 
-div#nav ul>img:hover {
+div#nav ul li img:hover {
     border: 2px solid red;
     cursor: pointer;
 }
@@ -871,6 +865,7 @@ div.content-container-left {
     margin-left: 7.5%;
     overflow: auto;
     padding-right: 50px;
+    padding-bottom: 50px;
     box-sizing: border-box;
 }
 
@@ -1145,4 +1140,9 @@ a.btor:hover {
 tr.border-bottom {
     border-top: 0px;
     border-bottom: 2px solid #e3e3e3;
+}
+
+div#main-wrapper {
+    position: relative;
+    overflow: auto;
 }

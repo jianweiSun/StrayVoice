@@ -102,7 +102,6 @@
 // read song_length
     var fetchSongLength = function(input) {
         if (input.files[0]) {
-            console.log(input.files[0].type);
             if ( input.files[0].type != 'audio/mp3' && input.files[0].type != 'audio/mpeg' ){
                 alert("請上傳mp3檔案");
                 // reset it

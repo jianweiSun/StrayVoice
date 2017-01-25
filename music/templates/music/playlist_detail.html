@@ -209,8 +209,13 @@
             },
             success : function(data, string, xhr){
                 var content_type = xhr.getResponseHeader('Content-Type');
-                if (content_type != "application/json" ) {
-                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                if (xhr.status == 278) {
+                    var url = xhr.getResponseHeader('Location'),
+                        pos = url.indexOf('?next='),
+                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
+                    $.get(redirect_url, function(data){
+                        dataAjaxLoad(data, redirect_url);
+                    })
                 }
                 else {
                     if (action == 'like') {
@@ -243,8 +248,13 @@
             },
             success : function(data, string, xhr){
                 var content_type = xhr.getResponseHeader('Content-Type');
-                if (content_type != "application/json" ) {
-                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                if (xhr.status == 278) {
+                    var url = xhr.getResponseHeader('Location'),
+                        pos = url.indexOf('?next='),
+                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
+                    $.get(redirect_url, function(data){
+                        dataAjaxLoad(data, redirect_url);
+                    })
                 }
                 else {
                     if (action == 'follow') {
@@ -276,8 +286,13 @@
             },
             success : function(data, string, xhr){
                 var content_type = xhr.getResponseHeader('Content-Type');
-                if (content_type != "application/json" ) {
-                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                if (xhr.status == 278) {
+                    var url = xhr.getResponseHeader('Location'),
+                        pos = url.indexOf('?next='),
+                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
+                    $.get(redirect_url, function(data){
+                        dataAjaxLoad(data, redirect_url);
+                    })
                 }
                 else {
                     if (action == 'like') {
@@ -342,8 +357,13 @@
             type: "GET",
             'url': url,
             success: function(data, string, xhr){
-                if ($('<div></div>').html(data).find('div#login-box').length) {
-                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                if (xhr.status == 278) {
+                    var url = xhr.getResponseHeader('Location'),
+                        pos = url.indexOf('?next='),
+                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
+                    $.get(redirect_url, function(data){
+                        dataAjaxLoad(data, redirect_url);
+                    })
                 }
                 else {
                     $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
@@ -416,9 +436,13 @@
             type: "GET",
             'url': url,
             success: function(data, string, xhr){
-                // tricky way to handle redirect
-                if ($('<div></div>').html(data).find('div#login-box').length) {
-                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                if (xhr.status == 278) {
+                    var url = xhr.getResponseHeader('Location'),
+                        pos = url.indexOf('?next='),
+                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
+                    $.get(redirect_url, function(data){
+                        dataAjaxLoad(data, redirect_url);
+                    })
                 }
                 else {
                     $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);

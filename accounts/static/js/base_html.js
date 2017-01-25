@@ -1,9 +1,13 @@
 (function(){
-// user icon and dropdown menu
-    $('img#user-icon').on('click', function(e){
+// dropdown menu auto-close
+    $('body').on('click', 'ul.dropdown-menu a', function(){
+        $(this).closest('ul.dropdown-menu').hide();
+    })
+
+// user icon
+    $('div#nav').on('click', 'img#user-icon', function(e){
         var $playerWrapper = $('#player-wrapper'),
             $playQueueWrapper = $playerWrapper.find('div#play-queue-wrapper');
-
         if (!$playerWrapper .is(':hidden')) {
             if (!$playQueueWrapper.is(':hidden')) {
                 $playQueueWrapper.slideUp('200').promise().done(WrapperUp);
@@ -19,9 +23,6 @@
         e.preventDefault();
     });
 
-    $('ul.dropdown-menu a').on('click', function(){
-        $(this).closest('ul.dropdown-menu').hide();
-    })
 // player handle
     $('a#player-handle').on('click', function(e){
         if (!$('ul.dropdown-menu').is('hidden')) {
@@ -51,22 +52,18 @@
         $(this).siblings().toggle();
     });
 
-// AJAX utility funciton
-var
-
-
 // handle 'a' href AJAX way
     $(document).on('click', 'a', function(e){
         var href  = this.href,
-            location = document.location.href;
-        // do nothing if logout or href == '#'
-        if ( !(href.slice(-1) == '#') && !(href.endsWith('logout/')) ){
-            var $container = $('div#container'),
-                $script = $('script#main'),
-                ori_title = document.title,
-                ori_url = document.location.href;
+            $container = $('div#container'),
+            $script = $('script#main'),
+            ori_title = document.title,
+            ori_url = document.location.href;
+
+    // do nothing if logout or href == '#'
+        if ( !(href.slice(-1) == '#') ){
             e.preventDefault();
-            // create state obj for the first page( normal load without AJAX)
+        // create state obj for the first page( normal load without AJAX)
             if (history.state == null){
                 history.replaceState(
                     {'html':$container.html(), 'script': $script.html(), 'title': ori_title},
@@ -77,37 +74,77 @@ var
 
             $.ajax({
                 type: "GET",
-                'url': href,
+                url: href,
                 success: function(data, string, xhr){
-                    var $data_div = $('<div></div>').html(data),
-                        $content = $data_div.find('div#container'),
-                        $script = $data_div.find('script#main'),
-                        $title = $data_div.find('title');
-
-                    $container.html($content.html());
-                    $script.html($script.html());
-                    document.title = $title.text();
-
-                    eval($script.html());
-
-                    history.pushState(
-                        {'html':$container.html(), 'script': $script.html(), 'title': $title.text()},
-                        $title.text(),
-                        href
-                    )
+                    if (xhr.status == 278) {
+                        var url = xhr.getResponseHeader('Location');
+                        $.get(url, function(data){
+                            dataAjaxLoad(data, url);
+                        })
+                    }
+                    else {
+                        dataAjaxLoad(data, href)
+                    }
                 },
             });
         }
     });
+
+// popstate event handle prev/forward page btn
     window.onpopstate = function(e){
         if(e.state){
-            $('div#container').html(e.state.html);
+            var $container = $('div#main-wrapper');
+            $container.html(e.state.html);
             $('script#main').html(e.state.script);
             document.title = e.state.title;
             eval(e.state.script);
         }
     };
 
+// handle all forms AJAX way
+    $(document).on('submit', 'form', function(e){
+        var formData = new FormData(this),
+            url = this.action,
+            method = this.method;
+        // action == '#' already handle AJAX WAY
+        if (this.action.slice(-1) == '#'){
+            return;
+        }
+
+        e.preventDefault();
+
+        if (method == "post") {
+            $.ajax({
+                type: method,
+                'url': url,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(data, string, xhr){
+                    if (xhr.status == 278) {
+                        var url = xhr.getResponseHeader('Location');
+                        $.get(url, function(data){
+                            dataAjaxLoad(data, url);
+                        })
+                    }
+                    else {
+                        dataAjaxLoad(data, url);
+                    }
+                }
+            });
+        }
+    // GET method not work with formData, probably request.GET can't deal with it
+        else {
+            $.ajax({
+                type: method,
+                'url': url,
+                data: $(this).serialize(),
+                success: function(data, string, xhr){
+                    dataAjaxLoad(data, url);
+                }
+            });
+        }
+    });
 })();
 
 

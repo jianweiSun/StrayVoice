@@ -70,7 +70,7 @@
 {% endblock %}
 
 {% block domready %}
-    // table hover effect
+// table hover effect
     $('tbody>tr').hover(function(){
         $(this).css('background-color', '#e3e3e3')
                .find('i.play-song').show();
@@ -79,27 +79,53 @@
                    .find('i.play-song').hide();
     });
 
-    // deal with song_change_album
-        $('a.song-change-album').on('click', function(e){
-            var url = $(this).attr('href'),
-                $body = $('body');
-            e.preventDefault();
-            $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
-            $('<div></div>', { 'id': 'fixed-center' })
-                            .load(url, popOutActivate).prependTo($body);
+// deal with song_change_album
+    $('a.song-change-album').on('click', function(e){
+        var $song_row = $(this).closest('tr.song-row'),
+            song_id = $song_row.data('id'),
+            url = '{% url 'music:song_change_album' '00000'%}'.replace('00000', song_id),
+            $body = $('body');
+        e.preventDefault();
+        $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
+        $('<div></div>', { 'id': 'fixed-center' })
+                        .load(url, popOutActivate).prependTo($body);
 
-            function popOutActivate() {
-                var popOutDiv = $(this),
-                    popOutCover = $(this).next('#popout-black-cover'),
-                    cancelButton = $(this).find('button[type=button]');
-                cancelButton.on('click', function(){
-                    popOutDiv.remove();
-                    popOutCover.remove();
+        function popOutActivate() {
+            var $popOutDiv = $(this),
+                $popOutCover = $popOutDiv.next('#popout-black-cover'),
+                cancelButton = $popOutDiv.find('button[type=button]'),
+                form = $popOutDiv.find('form');
+
+            cancelButton.on('click', function(){
+                $popOutDiv.remove();
+                $popOutCover.remove();
+            });
+
+            form.on('submit', function(e){
+                var data = form.serializeArray();
+
+                $.ajax({
+                    type: "POST",
+                    'url': url,
+                    data: data,
+                    success: function(data){
+                        $popOutDiv.remove();
+                        $popOutCover.remove();
+                        if(data.saved == "OK") {
+                            $song_row.remove();
+                            $('tbody#sort-table').children().each(function(index, item){
+                                $(item).find('td').first().text(index+1);
+                            });
+                        }
+                    },
+                    error: function(){ alert('錯誤') }
                 });
-            };
-        });
+                e.preventDefault();
+            });
+        };
+    });
 
-    // active play-song button
+// active play-song button
     $('tr.song-row').find('i.play-song').on('click', function(){
         var song_id = $(this).closest('tr.song-row').data('id'),
             url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);

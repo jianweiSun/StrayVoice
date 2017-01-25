@@ -167,11 +167,13 @@ class SongChangeAlbumView(TemplateResponseMixin, LoginRequiredMixin, View):
             album = form.cleaned_data['album']
             # if change album, reset order to None, let OrderField handle it automatically
             # also , if album is not changed, do nothing
-            if prev_album != album:
+            if prev_album == album:
+                return JsonResponse({'saved': 'No'})
+            else:
                 self.song.order = None
                 self.song.album = album
                 self.song.save()
-            return redirect(reverse('music:album_edit', args=[prev_album.id]))
+            return JsonResponse({'saved': 'OK'})
         else:
             return HttpResponseForbidden()
 

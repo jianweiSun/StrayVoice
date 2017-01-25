@@ -31,25 +31,26 @@
 					<i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i>
 				</a>
 			</li>
-            {% if request.user.is_authenticated %}
-                {% if not request.user.frontpagecontent.head_portrait %}
-                    <img id="user-icon" src="{% static 'img/default_head_portrait.jpeg' %}">
+            <li id="log-btn">
+                {% if request.user.is_authenticated %}
+                    {% if not request.user.frontpagecontent.head_portrait %}
+                        <img id="user-icon" src="{% static 'img/default_head_portrait.jpeg' %}">
+                    {% else %}
+                    {% thumbnail request.user.frontpagecontent.head_portrait "55x55" crop="center" as im %}
+                        <img id="user-icon" src="{{ im.url }}" width="{{ im.width }}" height="im.height">
+                    {% endthumbnail %}
+                    {% endif %}
                 {% else %}
-                {% thumbnail request.user.frontpagecontent.head_portrait "55x55" crop="center" as im %}
-                    <img id="user-icon" src="{{ im.url }}" width="{{ im.width }}" height="im.height">
-                {% endthumbnail %}
+                    <a href="{% url 'login' %}" class=" btn">登入</a>
                 {% endif %}
-            {% else %}
-                <li>
-                    <a href="{% url 'login' %}" class="btn">登入</a>
-                </li>
-            {% endif %}
+            </li>
 		</ul>
 	</div>
 </div>
 
-{% if request.user.is_authenticated %}
+
 <ul class="dropdown-menu">
+    {% if request.user.is_authenticated %}
     <li>
         <a href="{% url 'userpage:front_page' request.user.username %}">我的首頁</a>
     </li>
@@ -74,8 +75,9 @@
     <li>
         <a href="{% url 'logout' %}">登出</a>
     </li>
+    {% endif %}
 </ul>
-{% endif %}
+
 
 <div id='player-wrapper'>
     <audio>
@@ -157,9 +159,10 @@
     </div>
 </div>
 
-
+<div id="main-wrapper">
 {% block content %}
 {% endblock %}
+</div>
 
 <div id="footer">
 </div>
@@ -167,15 +170,16 @@
  var csrfToken = "{{ csrf_token }}";
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="{% static 'js/player.js' %}"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-<script src="{% static 'js/base_html.js' %}"></script>
+<script src="{% static 'js/player.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
+<script src="{% static 'js/base_html.js' %}"></script>
 {% block script %}
 {% endblock %}
 <script id="main">
 
     $(document).ready(function(){
+
         {% block domready %}
         {% endblock %}
     });
