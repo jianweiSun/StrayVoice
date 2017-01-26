@@ -110,10 +110,8 @@ class PlaylistDetailView(TemplateResponseMixin, View):
             playlist = get_object_or_404(Playlist, user=owner, id=playlist_id)
         else:
             playlist = get_object_or_404(Playlist, user=owner, id=playlist_id, published=True)
-        songs = playlist.songs.order_by('playlistsongsship__order')
 
-        return self.render_to_response({'playlist': playlist,
-                                        'songs': songs})
+        return self.render_to_response({'playlist': playlist})
 
 
 @method_decorator(ajax_required, name='dispatch')
@@ -153,7 +151,7 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
                 for song in self.album.get_published_songs():
                     PlayListSongsShip.objects.create(playlist=playlist, song=song)
             else:
-                for song in self.playlist.songs.order_by('playlistsongsship__order'):
+                for song in self.playlist.get_published_songs():
                     PlayListSongsShip.objects.create(playlist=playlist, song=song)
             return JsonResponse({'saved': 'OK'})
         else:

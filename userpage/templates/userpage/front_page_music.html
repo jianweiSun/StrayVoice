@@ -194,14 +194,7 @@
 
 {% block section_script %}
 
-// table hover-effect
-    $('table.songs-table tbody tr').hover(function(){
-        $(this).css('background-color', '#e3e3e3')
-               .find('i.play-song').show();
-    }, function(){
-            $(this).css('background-color', 'white')
-                   .find('i.play-song').hide();
-    });
+    tableHoverEffect($('table.songs-table tbody tr'));
 
 // plus-btn toggle plus menu
     $('i.fa-plus').on('click', function(){

@@ -16,7 +16,7 @@
             {% endif %}
         </ul>
         <p>請輸入你的帳號與密碼</p>
-        <form action="" method="post">
+        <form id="login-form" action="" method="post">
             <p>{{ form.username }}</p>
             <p>{{ form.password }}</p>
             {% csrf_token %}

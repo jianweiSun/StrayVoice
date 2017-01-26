@@ -89,26 +89,26 @@ class AlbumSongsAppend(TemplateResponseMixin, View):
 
 
 @method_decorator(ajax_required, name='dispatch')
-class PlaylistSongsAppend(TemplateResponseMixin, View):
-    template_name = 'playqueue/queue_songs.html'
-
-    def get(self, request, playlist_id):
-        playlist = get_object_or_404(Playlist, id=playlist_id)
-        playlist_songs = playlist.songs.order_by('playlistsongsship__order')
-        ids_lists = list(playlist.songs.order_by('playlistsongsship__order').values_list('id', flat=True))
-        queue = PlayQueue(request)
-        queue.extend(ids_lists)
-        return self.render_to_response({'songs': playlist_songs})
-
-
-@method_decorator(ajax_required, name='dispatch')
 class PlaylistSongsExchange(TemplateResponseMixin, View):
     template_name = 'playqueue/queue_songs.html'
 
     def get(self, request, playlist_id):
         playlist = get_object_or_404(Playlist, id=playlist_id)
-        ids_lists = list(playlist.songs.order_by('playlistsongsship__order').values_list('id', flat=True))
+        ids_lists = list(playlist.get_published_songs().values_list('id', flat=True))
         queue = PlayQueue(request)
         queue.exchange(ids_lists)
         return self.render_to_response({'songs': queue})
+
+
+@method_decorator(ajax_required, name='dispatch')
+class PlaylistSongsAppend(TemplateResponseMixin, View):
+    template_name = 'playqueue/queue_songs.html'
+
+    def get(self, request, playlist_id):
+        playlist = get_object_or_404(Playlist, id=playlist_id)
+        playlist_songs = playlist.get_published_songs()
+        ids_lists = list(playlist_songs.values_list('id', flat=True))
+        queue = PlayQueue(request)
+        queue.extend(ids_lists)
+        return self.render_to_response({'songs': playlist_songs})
 

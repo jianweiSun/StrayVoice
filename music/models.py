@@ -132,6 +132,9 @@ class Playlist(models.Model):
     def __str__(self):
         return self.name
 
+    def get_published_songs(self):
+        return self.songs.filter(published=True).order_by('playlistsongsship__order')
+
     def get_absolute_url(self):
         return reverse('music:playlist_detail', args=[self.user.username, self.id])
 

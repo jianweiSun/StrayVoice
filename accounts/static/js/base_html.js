@@ -106,8 +106,8 @@
         var formData = new FormData(this),
             url = this.action,
             method = this.method;
-        // action == '#' already handle AJAX WAY
-        if (this.action.slice(-1) == '#'){
+        // action == '#' already handle AJAX WAY, if user use login-form we refresh
+        if (this.action.slice(-1) == '#' || this.getAttribute('id') == 'login-form'){
             return;
         }
 

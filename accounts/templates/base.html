@@ -81,7 +81,7 @@
 
 <div id='player-wrapper'>
     <audio>
-        <source src="https://streams.streetvoice.cn/music/FU/HE/FUHEYU/45a7732e63334793a9f795e5ec1d92cb.mp3?e=1483268872&token=JNyZUKZZQ7xxV-mUm4x4cQSNoEaFZ6dNss8OyB5X:8QaHp2BxBOJgOud_wwec13FGT-8=" type="audio/mpeg">
+        <source type="audio/mpeg">
     </audio>
     <div id='bar-wrapper'>
         <div id="progress-bar"></div>
@@ -166,13 +166,13 @@
 
 <div id="footer">
 </div>
-<script>
- var csrfToken = "{{ csrf_token }}";
+<script id="token">
+    csrfToken = "{{ csrf_token }}";
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-<script src="{% static 'js/player.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
+<script src="{% static 'js/player.js' %}"></script>
 <script src="{% static 'js/base_html.js' %}"></script>
 {% block script %}
 {% endblock %}

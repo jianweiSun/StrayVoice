@@ -48,7 +48,7 @@
                 <table class="no-border">
                     <tr>
                         <th>曲目</th>
-                        <td>{{ playlist.songs.count }}</td>
+                        <td>{{ playlist.get_published_songs.count }}</td>
                     </tr>
                     <tr>
                         <th>發佈</th>
@@ -89,7 +89,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for song in songs %}
+                        {% for song in playlist.get_published_songs %}
                         <tr class='song-row' data-id="{{ song.id }}">
                             <td>{{ forloop.counter }}</td>
                             <td>
@@ -142,6 +142,8 @@
         pos_last = document.URL.indexOf('/', pos+10),
         playlist_id = document.URL.slice(pos+10, pos_last);
 
+    tableHoverEffect($('div[data-tag="songs"] tbody tr'));
+
 // tag click
     $('div#tags a').on('click', function(e){
         var $this = $(this),
@@ -152,14 +154,7 @@
         e.preventDefault();
     });
 
-// table hover-effect
-    $('div[data-tag="songs"] tbody tr').hover(function(){
-        $(this).css('background-color', '#e3e3e3')
-               .find('i.play-song').show();
-    }, function(){
-            $(this).css('background-color', 'white')
-                   .find('i.play-song').hide();
-    });
+
 
 // active play-song button
     $('tr.song-row').find('i.play-song').on('click', function(){

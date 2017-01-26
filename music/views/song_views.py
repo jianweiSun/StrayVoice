@@ -97,7 +97,10 @@ class SongDeleteView(LoginRequiredMixin, DeleteView):
         return context
 
     def get_success_url(self):
-        return reverse('music:album_edit', args=[self.album.id])
+        if self.album.name == "未分類專輯":
+            return reverse('music:un_album_songs')
+        else:
+            return reverse('music:album_edit', args=[self.album.id])
 
 
 class SongDetailView(TemplateResponseMixin, View):

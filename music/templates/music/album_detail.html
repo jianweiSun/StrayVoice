@@ -135,6 +135,8 @@
         pos_last = document.URL.indexOf('/', pos+7),
         album_id = document.URL.slice(pos+7, pos_last);
 
+    tableHoverEffect($('div[data-tag="songs"] tbody tr'));
+
 // tag click
     $('div#tags a').on('click', function(e){
         var $this = $(this),
@@ -144,8 +146,6 @@
         $('div[data-tag=' + tag + ']').show().siblings().hide();
         e.preventDefault();
     });
-
-
 
 // active play-song button
     $('tr.song-row').find('i.play-song').on('click', function(){

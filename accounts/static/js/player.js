@@ -42,6 +42,7 @@ AudioPlayer.prototype.song_init = function($song_li){
     // load data into bar
     $song_li.find('div.close-wrapper').remove();
     $song_li.find('i.queue-play-btn').remove();
+    $song_li.find('div.like-wrapper').append();
 
     this.playingSongData.html('').append($song_li);
     // load source
@@ -257,8 +258,21 @@ AudioPlayer.prototype.repeatButtonSet = function() {
 };
 
 AudioPlayer.prototype.autoFetchNext = function () {
-    var self = this;
+    var self = this,
+        active_pause = 'queue-play-btn div-center fa fa-play-circle fa-3x queue-playing';
+
     this.audio.addEventListener('ended', function(){
+        var $all = self.playQueue.find('li'),
+            $unactive = $all.not('li.active'),
+            $queue_btn = self.playQueue.find('li.active i.queue-play-btn');
+    // pause if only one song
+        if (!$unactive.length) {
+            self.playButton.removeClass('fa-pause')
+                           .addClass('fa-play');
+            $queue_btn.removeClass().addClass(active_pause);
+            return;
+        }
+
         if (self.repeatButton.hasClass('fa-rotate-left')) {
             self.forwardButton.trigger('click');
         }
@@ -321,7 +335,7 @@ AudioPlayer.prototype.queueClearButtonSet = function() {
     });
 };
 
- // bin the event to make btns on playqueue and now-playing song data work
+ // bind the event to make btns on playqueue and now-playing song data work
 AudioPlayer.prototype.likeButtonSet = function() {
     var self = this;
     this.container.on('click', 'i.queue-like-btn', function(){
@@ -341,11 +355,15 @@ AudioPlayer.prototype.likeButtonSet = function() {
             },
             success : function(data, string, xhr){
                 var content_type = xhr.getResponseHeader('Content-Type');
-                if (content_type != "application/json" ) {
-                    window.location.href = '/accounts/login/?next=' + window.location.pathname;
+                if (xhr.status == 278) {
+                    var url = xhr.getResponseHeader('Location'),
+                        pos = url.indexOf('?next='),
+                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
+                    $.get(redirect_url, function(data){
+                        dataAjaxLoad(data, redirect_url);
+                    })
                 }
                 else {
-
                     if ($li.hasClass('active') || $li.parent().is('#playing-data-wrapper')) {
                         var $btn_on_playing = self.container.find('ul#playing-data-wrapper i.queue-like-btn'),
                             $btn_on_queue = $active = self.playQueue.find('li.active i.queue-like-btn');

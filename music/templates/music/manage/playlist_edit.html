@@ -64,42 +64,57 @@
             </tr>
         </thead>
         <tbody id="sort-table">
-            {% for song in songs %}
-            <tr class='song-row' data-id="{{ song.id }}" data-playlistsongsship_id="{{ song.playlistsongsship_id }}">
-                <td>{{ forloop.counter }}</td>
-                <td>
-                    <div class="small-song-icon">
-                        {% if not song.cover %}
-                            <img src="{% static 'img/no_image_photo_40X40.png' %}" height="40px" width="40px">
-                        {% else %}
-                        {% thumbnail song.cover "40x40" crop="center" as im %}
-                            <img src="{{ im.url }}" height="40px" width="40px">
-                        {% endthumbnail %}
-                        {% endif %}
-                        <i class="play-song fa fa-play-circle-o fa-2x" aria-hidden="true"></i>
-                    </div>
-                    <a href="{{ song.get_absolute_url }}">
-                        {{ song.name }}
-                    </a>
-                </td>
-                <td>
-                    <a href="{% url 'userpage:front_page' song.user.username %}">
-                        {{ song.user.profile.nickname }}
-                    </a>
-                </td>
-                <td>{{ song.length }}</td>
-                <td>
-                    <a class="song_change_playlist btn" href="#">
-                        移至
-                    </a>
-                </td>
-                <td>
-                    <a class="song_delete_playlist btn" href="#">
-                        刪除
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
+        {% for song in songs %}
+            {% if not song.published %}
+                <tr class='song-row' data-id="{{ song.id }}" data-playlistsongsship_id="{{ song.playlistsongsship_id }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td><span style="color: red; line-height:40px;">該歌曲已經被隱藏</span></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <a class="song_delete_playlist btn" href="#">
+                            刪除
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr class='song-row' data-id="{{ song.id }}" data-playlistsongsship_id="{{ song.playlistsongsship_id }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <div class="small-song-icon">
+                            {% if not song.cover %}
+                                <img src="{% static 'img/no_image_photo_40X40.png' %}" height="40px" width="40px">
+                            {% else %}
+                            {% thumbnail song.cover "40x40" crop="center" as im %}
+                                <img src="{{ im.url }}" height="40px" width="40px">
+                            {% endthumbnail %}
+                            {% endif %}
+                            <i class="play-song fa fa-play-circle-o fa-2x" aria-hidden="true"></i>
+                        </div>
+                        <a href="{{ song.get_absolute_url }}">
+                            {{ song.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'userpage:front_page' song.user.username %}">
+                            {{ song.user.profile.nickname }}
+                        </a>
+                    </td>
+                    <td>{{ song.length }}</td>
+                    <td>
+                        <a class="song_change_playlist btn" href="#">
+                            移至
+                        </a>
+                    </td>
+                    <td>
+                        <a class="song_delete_playlist btn" href="#">
+                            刪除
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
         </tbody>
     </table>
 </div>
@@ -112,6 +127,8 @@
 {% block domready %}
     $('#id_name').attr('placeholder', '請輸入歌單名稱');
     $('#id_description').attr('placeholder', '請輸入歌單介紹文字');
+
+    tableHoverEffect($('tbody>tr'));
 
 // img preview
     var readURL = function(input) {
@@ -129,14 +146,6 @@
 
     $('#id_cover').on('change', function(){
         readURL(this);
-    });
-// table hover-effect
-    $('tbody>tr').hover(function(){
-        $(this).css('background-color', '#e3e3e3')
-               .find('i.play-song').show();
-    }, function(){
-            $(this).css('background-color', 'white')
-                   .find('i.play-song').hide();
     });
 
 // song_change_playlist
