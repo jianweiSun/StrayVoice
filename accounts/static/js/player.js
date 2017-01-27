@@ -32,7 +32,8 @@ AudioPlayer.prototype.init = function(){
 	this.queueClearButtonSet();
 	this.likeButtonSet();
 	// trigger the first song
-    this.playQueue.find('li:first').find('i.queue-play-btn').trigger('click');
+    this.playQueue.find('li:first').find('i.queue-play-btn').trigger('click')
+                                                            .trigger('click');
 }
 
 AudioPlayer.prototype.song_init = function($song_li){
@@ -297,6 +298,7 @@ AudioPlayer.prototype.queueCloseButtonSet = function() {
         var $this = $(this),
             $li = $this.closest('li'),
             index = $li.index();
+
         $.ajax({
             type: "GET",
             url: "/playqueue/" + index + "/remove/",

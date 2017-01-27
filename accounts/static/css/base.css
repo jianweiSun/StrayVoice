@@ -786,7 +786,7 @@ ul#play-queue img, ul#playing-data-wrapper img {
 }
 ul#play-queue a, ul#playing-data-wrapper a {
     display: block;
-    padding: 6px 0px;
+    padding: 3px 0px;
     color: #5b5b5b;
 }
 
@@ -815,7 +815,7 @@ div.close-wrapper {
     position: absolute;
     top: 3px;
     right: 15px;
-    overflow: auto;
+    overflow: visible;
     width: 15px;
     height: 15px;
     display: none;
@@ -833,7 +833,7 @@ ul#playing-data-wrapper {
     height: inherit;
     width: 30%;
     position: relative;
-    overflow: auto;
+    overflow: visible;
     float: left;
     list-style-type: none;
 }

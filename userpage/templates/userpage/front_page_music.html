@@ -111,10 +111,13 @@
     <div class="row" data-id="{{ unalbum.id }}">
         <div class="row-left-30">
             <div class="cover-playbtn">
+                {% if not user.frontpagecontent.head_portrait %}
+                    <img src="{% static 'img/default_head_portrait_big.jpeg' %}" height="250px" width="250px">
                 {% thumbnail user.frontpagecontent.head_portrait "250x250" crop="center" as im %}
                     <img src="{{ im.url }}" height="250px" width="250px">
                 {% endthumbnail %}
                     <i class="album-play-btn play-song-br fa fa-play-circle-o fa-3x" aria-hidden="true"></i>
+                {% endif %}
             </div>
             <div class="item-box-title left text-ellipsis">
                     {{ unalbum.name }}

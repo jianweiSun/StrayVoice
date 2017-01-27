@@ -5,7 +5,7 @@ from music.models import Song, Playlist, Album
 from accounts.models import FollowShip
 from itertools import chain
 from .utils import queryset_paging
-from django.db.models import Count, Sum, IntegerField
+from django.db.models import Sum, IntegerField, Case, When
 
 
 class BrowseAllView(TemplateResponseMixin, View):
@@ -119,7 +119,9 @@ class PlaylistBrowseAllView(TemplateResponseMixin, View):
 
     def get(self, request, order_type):
         playlists = Playlist.objects.filter(published=True)\
-                            .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
+                            .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                            output_field=IntegerField()))
+                                      )\
                             .exclude(songs_number=0).select_related('user__profile')
 
         if order_type == 'latest':
@@ -145,7 +147,9 @@ class PlaylistBrowseMineView(LoginRequiredMixin, TemplateResponseMixin, View):
     def get(self, request, order_type):
         # able to browse un-published playlist of yourself
         playlists = Playlist.objects.filter(user=request.user)\
-                            .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
+                            .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                            output_field=IntegerField()))
+                                      )\
                             .exclude(songs_number=0).select_related('user__profile')
 
         if order_type == 'latest':
@@ -169,9 +173,11 @@ class PlaylistBrowseLikeView(LoginRequiredMixin, TemplateResponseMixin, View):
         return super(PlaylistBrowseLikeView, self).dispatch(request, *args, order_type, **kwargs)
 
     def get(self, request, order_type):
-        playlists = request.user.like_playlists.filter(published=True)\
-                                .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
-                                .exclude(songs_number=0).select_related('user__profile')
+        playlists = request.user.like_playlists.filter(published=True) \
+                           .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                           output_field=IntegerField()))
+                                     ) \
+                           .exclude(songs_number=0).select_related('user__profile')
 
         if order_type == 'latest':
             playlists = playlists.order_by('-created')
@@ -198,8 +204,10 @@ class PlaylistBrowseFollowView(LoginRequiredMixin, TemplateResponseMixin, View):
     def get(self, request, order_type):
         following_list = FollowShip.objects.filter(profile_from=request.user.profile)\
                                            .values_list('profile_to__user', flat=True)
-        playlists = Playlist.objects.filter(published=True, user__in=following_list)\
-                            .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
+        playlists = Playlist.objects.filter(published=True, user__in=following_list) \
+                            .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                            output_field=IntegerField()))
+                                      ) \
                             .exclude(songs_number=0).select_related('user__profile')
         # to make pagination we must turn itertools.chain to list, so it has length
         if order_type == 'latest':
@@ -209,8 +217,9 @@ class PlaylistBrowseFollowView(LoginRequiredMixin, TemplateResponseMixin, View):
         else:
             followship_obj = FollowShip.objects.filter(profile_from=request.user.profile).order_by('-created')
             playlists_by_individual_list = [obj.profile_to.user.playlists.filter(published=True)
-                                               .annotate(songs_number=Sum('songs__published',
-                                                                          output_field=IntegerField()))
+                                               .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                                               output_field=IntegerField()))
+                                                         )
                                                .exclude(songs_number=0)
                                                .select_related('user__profile') for obj in followship_obj]
             playlists = list(chain.from_iterable(playlists_by_individual_list))
@@ -231,9 +240,11 @@ class AlbumBrowseAllView(TemplateResponseMixin, View):
         return super(AlbumBrowseAllView, self).dispatch(request, *args, order_type, **kwargs)
 
     def get(self, request, order_type):
-        albums = Album.objects.exclude(name='未分類專輯')\
-                              .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
-                              .exclude(songs_number=0).select_related('user__profile')
+        albums = Album.objects.exclude(name='未分類專輯') \
+                      .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                      output_field=IntegerField()))
+                                ) \
+                      .exclude(songs_number=0).select_related('user__profile')
 
         if order_type == 'latest':
             albums = albums.order_by('-created')
@@ -256,9 +267,11 @@ class AlbumBrowseMineView(LoginRequiredMixin, TemplateResponseMixin, View):
         return super(AlbumBrowseMineView, self).dispatch(request, *args, order_type, **kwargs)
 
     def get(self, request, order_type):
-        albums = Album.objects.filter(user=request.user).exclude(name='未分類專輯')\
-                              .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
-                              .exclude(songs_number=0).select_related('user__profile')
+        albums = Album.objects.filter(user=request.user).exclude(name='未分類專輯') \
+                      .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                      output_field=IntegerField()))
+                                ) \
+                      .exclude(songs_number=0).select_related('user__profile')
 
         if order_type == 'latest':
             albums = albums.order_by('-created')
@@ -281,9 +294,11 @@ class AlbumBrowseLikeView(LoginRequiredMixin, TemplateResponseMixin, View):
         return super(AlbumBrowseLikeView, self).dispatch(request, *args, order_type, **kwargs)
 
     def get(self, request, order_type):
-        albums = request.user.like_albums\
-                             .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
-                             .exclude(songs_number=0).select_related('user__profile')
+        albums = request.user.like_albums \
+                        .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                        output_field=IntegerField()))
+                                  ) \
+                        .exclude(songs_number=0).select_related('user__profile')
 
         if order_type == 'latest':
             albums = albums.order_by('-created')
@@ -310,9 +325,11 @@ class AlbumBrowseFollowView(LoginRequiredMixin, TemplateResponseMixin, View):
     def get(self, request, order_type):
         following_list = FollowShip.objects.filter(profile_from=request.user.profile)\
                                            .values_list('profile_to__user', flat=True)
-        albums = Album.objects.filter(user__in=following_list).exclude(name='未分類專輯')\
-                              .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
-                              .exclude(songs_number=0).select_related('user__profile')
+        albums = Album.objects.filter(user__in=following_list).exclude(name='未分類專輯') \
+                      .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                      output_field=IntegerField()))
+                                ) \
+                      .exclude(songs_number=0).select_related('user__profile')
         # to make pagination we must turn itertools.chain to list, so it has length
         if order_type == 'latest':
             albums = albums.order_by('-created')
@@ -321,7 +338,9 @@ class AlbumBrowseFollowView(LoginRequiredMixin, TemplateResponseMixin, View):
         else:
             followship_obj = FollowShip.objects.filter(profile_from=request.user.profile).order_by('-created')
             albums_by_individual_list = [obj.profile_to.user.albums.exclude(name='未分類專輯')
-                                            .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))
+                                            .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                                            output_field=IntegerField()))
+                                                      )
                                             .select_related('user__profile') for obj in followship_obj]
             albums = list(chain.from_iterable(albums_by_individual_list))
 

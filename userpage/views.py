@@ -2,10 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic.base import View, TemplateResponseMixin
 from django.contrib.auth.models import User
 from .forms import HeadPortraitUpdateForm
-from django.db.models import Sum, IntegerField, Count
 from browse.utils import queryset_paging
 from django.http import HttpResponseNotFound
-from accounts.models import FollowShip
+from django.db.models import Sum, Case, When, IntegerField
 
 
 def get_tmp_homepage(request):
@@ -17,11 +16,15 @@ class FrontPageView(TemplateResponseMixin, View):
 
     def dispatch(self, request, *args, username=None, **kwargs):
         self.user = get_object_or_404(User, username=username)
-        self.albums = self.user.albums.exclude(name='未分類專輯')\
-                                      .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
-                                      .exclude(songs_number=0)
-        self.unalbum = self.user.albums.filter(name='未分類專輯')\
-                                .annotate(songs_number=Sum('songs__published', output_field=IntegerField()))\
+        self.albums = self.user.albums.exclude(name='未分類專輯') \
+                               .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                               output_field=IntegerField()))
+                                         ) \
+                               .exclude(songs_number=0)
+        self.unalbum = self.user.albums.filter(name='未分類專輯') \
+                                .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                                output_field=IntegerField()))
+                                          ) \
                                 .exclude(songs_number=0).first()
         return super(FrontPageView, self).dispatch(request, *args, username, **kwargs)
 
@@ -61,8 +64,10 @@ class FrontPagePlaylistView(TemplateResponseMixin, View):
             return HttpResponseNotFound()
 
         self.user = get_object_or_404(User, username=username)
-        self.playlists = self.user.playlists.filter(published=True)\
-                                  .annotate(songs_number=Count('songs'))\
+        self.playlists = self.user.playlists.filter(published=True) \
+                                  .annotate(songs_number=Sum(Case(When(songs__published=True, then=1),
+                                                                  output_field=IntegerField()))
+                                            ) \
                                   .exclude(songs_number=0).select_related('user__profile')
         return super(FrontPagePlaylistView, self).dispatch(request, *args, username, order_type, **kwargs)
 
