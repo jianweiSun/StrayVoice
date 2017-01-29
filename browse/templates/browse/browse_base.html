@@ -86,20 +86,14 @@
 
 {% block domready %}
 
+    plusButtonToggleMenu();
+    ajaxSongUtilsSet(false, 'div.song-box', "{{ csrf_token }}");
+
 // handle song-play-btn
     $('i.song-play-btn').on('click', function(){
         var song_id = $(this).closest('div.song-box').data('id'),
             url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "html",
-            success : function(data){
-                $(data).prependTo(audioplayer.playQueue)
-                       .find('i.queue-play-btn').trigger('click');
-            },
-            error: function(){ alert('錯誤') }
-        });
+        ajaxSongPlay(url);
     });
 
 // handle songlist-play-btn
@@ -124,134 +118,4 @@
             error: function(){ alert('錯誤') }
         });
     });
-
-// song-like-btn
-    $('i.song-like-btn').on('click', function(){
-        var $this = $(this),
-            like_num = parseInt($this.text()),
-            song_id = $(this).closest('div.song-box').data('id'),
-            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
-
-        $.ajax({
-            type: "POST",
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            url: "{% url 'music:song_like' %}",
-            data: {
-                'song_id': song_id,
-                'action': action,
-            },
-            success : function(data, string, xhr){
-                if (xhr.status == 278) {
-                    var url = xhr.getResponseHeader('Location'),
-                        pos = url.indexOf('?next='),
-                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
-                    $.get(redirect_url, function(data){
-                        dataAjaxLoad(data, redirect_url);
-                    })
-                }
-                else {
-                    if (action == 'like') {
-                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
-                                                       .text(' ' + (like_num+1));
-                    }
-                    else {
-                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
-                                                       .text(' ' + (like_num-1));
-                    }
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
-
-// plus-btn toggle plus menu
-    $('i.fa-plus').on('click', function(){
-        var $this = $(this),
-            $menu = $this.siblings('ul.dropdown');
-
-        if ($menu.css('visibility') == 'hidden') {
-            $menu.css('visibility', 'visible');
-        }
-        else {
-            $menu.css('visibility', 'hidden');
-        }
-    });
-
-// song add queue
-    $('li.song-add-queue').on('click', function(){
-        var $this = $(this),
-            song_id = $this.closest('div.song-box').data('id'),
-            url = "{% url 'playqueue:song_append' '00000' %}".replace('00000', song_id);
-
-        $.ajax({
-            type: "GET",
-            'url': url,
-            dataType: "html",
-            success : function(data){
-                $(data).appendTo(audioplayer.playQueue);
-                $this.parent().css('visibility', 'hidden');
-                if (audioplayer.playQueue.find('li.active').length == 0) {
-                    audioplayer.playQueue.children().first()
-                                         .find('i.queue-play-btn').trigger('click');
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
-
-// song add playlist
-    $('li.song-add-playlist').on('click', function(e){
-        var $this = $(this),
-            $body = $('body'),
-            song_id = $this.closest('div.song-box').data('id'),
-            url = "{% url 'music:playlist_add' 'song' '00000' %}".replace('00000', song_id);
-
-        $this.parent().css('visibility', 'hidden');
-        $.ajax({
-            type: "GET",
-            'url': url,
-            success: function(data, string, xhr){
-                if (xhr.status == 278) {
-                    var url = xhr.getResponseHeader('Location'),
-                        pos = url.indexOf('?next='),
-                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
-                    $.get(redirect_url, function(data){
-                        dataAjaxLoad(data, redirect_url);
-                    })
-                }
-                else {
-                    $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
-                    $('<div></div>', { 'id': 'fixed-center' }).html(data).prependTo($body);
-                    popOutActivate();
-                }
-            },
-        });
-
-        function popOutActivate() {
-            var $popOutDiv = $('div#fixed-center'),
-                $popOutCover = $popOutDiv.next('#popout-black-cover'),
-                cancelButton = $popOutDiv.find('button[type=button]'),
-                form = $popOutDiv.find('form');
-
-            cancelButton.on('click', function(){
-                $popOutDiv.remove();
-                $popOutCover.remove();
-            });
-            form.on('submit', function(e){
-                $.ajax({
-                    type: "POST",
-                    'url': url,
-                    data: form.serialize(),
-                    success: function(data){
-                        $popOutDiv.remove();
-                        $popOutCover.remove();
-                    },
-                    error: function(){ alert('錯誤') }
-                });
-                e.preventDefault();
-            });
-        };
-    });
-
-
 {% endblock %}

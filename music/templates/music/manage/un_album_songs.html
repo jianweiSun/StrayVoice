@@ -73,6 +73,13 @@
 
     tableHoverEffect($('tbody>tr'));
 
+// active play-song button
+    $('tr.song-row').find('i.play-song').on('click', function(){
+        var song_id = $(this).closest('tr.song-row').data('id'),
+            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
+        ajaxSongPlay(url);
+    });
+
 // deal with song_change_album
     $('a.song-change-album').on('click', function(e){
         var $song_row = $(this).closest('tr.song-row'),
@@ -117,21 +124,5 @@
                 e.preventDefault();
             });
         };
-    });
-
-// active play-song button
-    $('tr.song-row').find('i.play-song').on('click', function(){
-        var song_id = $(this).closest('tr.song-row').data('id'),
-            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "html",
-            success : function(data){
-                $(data).prependTo($('ul#play-queue'))
-                       .find('i.queue-play-btn').trigger('click');
-            },
-            error: function(){ alert('錯誤') }
-        });
     });
 {% endblock %}

@@ -1,34 +1,3 @@
-/*  之後重構把功能聚集在這邊  */
-var dataAjaxLoad = function(data, href){
-    var $container = $('div#main-wrapper'),
-        $script_container = $('script#main'),
-        $token_container = $('script#token'),
-        $data_div = $('<div></div>').html(data),
-        $content = $data_div.find('div#main-wrapper'),
-        $script = $data_div.find('script#main'),
-        $token = $data_div.find('script#token'),
-        $title = $data_div.find('title'),
-        $log_btn = $data_div.find('div#nav li#log-btn'),
-        $ul_dropdown = $data_div.find('ul.dropdown-menu');
-
-    $container.html($content.html());
-    $script_container.html($script.html());
-    $token_container.html($token.html());
-    document.title = $title.text();
-//  update log-btn and menu to handle login/logout
-    $('div#nav li#log-btn').html($log_btn.html());
-    $('ul.dropdown-menu').html($ul_dropdown.html());
-
-    eval($token.html());
-    eval($script.html());
-//  exclude log_btn to behave properly while login/logout
-    history.pushState(
-        {'html':$container.html(), 'script': $script.html(), 'title': $title.text()},
-        $title.text(),
-        href
-    )
-};
-
 // hard code selector = 'i.play-song'
 var tableHoverEffect = function($row) {
     $row.hover(function(){
@@ -37,5 +6,56 @@ var tableHoverEffect = function($row) {
     }, function(){
         $(this).css('background-color', 'white')
                .find('i.play-song').hide();
+    });
+}
+
+var popOutActivate = function(url){
+    var $popOutDiv = $('div#fixed-center'),
+        $popOutCover = $popOutDiv.next('#popout-black-cover'),
+        cancelButton = $popOutDiv.find('button[type=button]'),
+        form = $popOutDiv.find('form');
+
+    cancelButton.on('click', function(){
+        $popOutDiv.remove();
+        $popOutCover.remove();
+    });
+    form.on('submit', function(e){
+        $.ajax({
+            type: "POST",
+            'url': url,
+            data: form.serialize(),
+            success: function(data){
+                $popOutDiv.remove();
+                $popOutCover.remove();
+            },
+            error: function(){ alert('錯誤') }
+        });
+        e.preventDefault();
+    });
+};
+
+// plus-btn toggle plus menu
+var plusButtonToggleMenu = function(){
+    $('i.fa-plus').on('click', function(){
+        var $this = $(this),
+            $menu = $this.siblings('ul.dropdown');
+
+        if ($menu.css('visibility') == 'hidden') {
+            $menu.css('visibility', 'visible');
+        }
+        else {
+            $menu.css('visibility', 'hidden');
+        }
+    });
+}
+
+var tagClickSet = function(){
+    $('div#tags a').on('click', function(e){
+        var $this = $(this),
+            tag = $(this).data('tag');
+        $(this).parent('li').addClass('selected')
+               .siblings().removeClass('selected');
+        $('div[data-tag=' + tag + ']').show().siblings().hide();
+        e.preventDefault();
     });
 }

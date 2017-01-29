@@ -32,8 +32,11 @@ AudioPlayer.prototype.init = function(){
 	this.queueClearButtonSet();
 	this.likeButtonSet();
 	// trigger the first song
-    this.playQueue.find('li:first').find('i.queue-play-btn').trigger('click')
-                                                            .trigger('click');
+    this.playQueue.find('li:first').find('i.queue-play-btn').trigger('click');
+    // avoid race condition between pause() and play()
+    setTimeout(function(){
+        self.playQueue.find('li:first').find('i.queue-play-btn').trigger('click');
+    }, 150);
 }
 
 AudioPlayer.prototype.song_init = function($song_li){
@@ -46,8 +49,8 @@ AudioPlayer.prototype.song_init = function($song_li){
     $song_li.find('div.like-wrapper').append();
 
     this.playingSongData.html('').append($song_li);
+
     // load source
-    this.audio.pause();
     $(this.audio).find('source').attr('src', src);
     this.audio.load();
 
@@ -178,7 +181,7 @@ AudioPlayer.prototype.queuePlayButtonSet = function() {
                 // clone the li then pass in to playing-data
                 self.song_init($li_to_pass)
                      .done(function(){
-                          self.playButton.trigger('click');
+                        self.playButton.trigger('click');
                      });
                 break;
             case active_pause:

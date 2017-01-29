@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -133,8 +133,7 @@ class PlaylistAddSongsView(TemplateResponseMixin, LoginRequiredMixin, View):
 
     def get(self, request, model_type, id):
         if not request.user.playlists.all():
-            template_name = 'music/manage/playlist_not_exist.html'
-            return self.render_to_response({})
+            return render(request, 'music/manage/playlist_not_exist.html', {})
 
         form = PlaylistAddSongsForm(user=request.user)
         return self.render_to_response({'form': form})

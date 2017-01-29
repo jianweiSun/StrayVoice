@@ -39,10 +39,10 @@
         <div id="tags" class="menu">
                 <ul>
                     <li class="selected">
-                        <a href="#" data-id="song-info">資訊</a>
+                        <a href="#" data-tag="song-info">資訊</a>
                     </li>
                     <li>
-                        <a href="#" data-id="lyrics">歌詞</a>
+                        <a href="#" data-tag="lyrics">歌詞</a>
                     </li>
                 </ul>
         </div>
@@ -71,14 +71,8 @@
     $('#id_description').attr('placeholder', '輸入介紹文字')
                         .attr('rows', '5');
     $('#id_lyrics').attr('placeholder', '請填入歌詞');
-    $('div#tags a').on('click', function(e){
-        var $this = $(this),
-            id = $(this).data('id');
-        $(this).parent('li').addClass('selected')
-               .siblings().removeClass('selected');
-        $('div#' + id).show().siblings().hide();
-        e.preventDefault();
-    });
+
+    tagClickSet();
 
 // img preview
     var previewIMG = function(input) {

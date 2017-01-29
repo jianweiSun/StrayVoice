@@ -2,21 +2,13 @@
 
 {% block domready %}
 
+    plusButtonToggleMenu();
+
 // album-play-btn
     $('i.item-play-btn').on('click', function(){
         var album_id = $(this).closest('div.item-box').data('id'),
             url = "{% url 'playqueue:album_exchange' "00000" %}".replace('00000', album_id);
-
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "html",
-            success : function(data){
-                $(data).prependTo(audioplayer.playQueue.empty());
-                audioplayer.forwardButton.trigger('click');
-            },
-            error: function(){ alert('錯誤') }
-        });
+        ajaxAlbumPlaylistPlay(url);
     });
 
 // album-like-btn
@@ -56,19 +48,6 @@
             },
             error: function(){ alert('錯誤') }
         });
-    });
-
-// plus-btn toggle plus menu
-    $('i.fa-plus').on('click', function(){
-        var $this = $(this),
-            $menu = $this.siblings('ul.dropdown');
-
-        if ($menu.css('visibility') == 'hidden') {
-            $menu.css('visibility', 'visible');
-        }
-        else {
-            $menu.css('visibility', 'hidden');
-        }
     });
 
 // album append queue

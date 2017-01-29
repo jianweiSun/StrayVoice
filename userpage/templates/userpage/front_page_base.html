@@ -14,10 +14,10 @@
                 <div id="profile" class="wrapper left">
                     {% if user.frontpagecontent.head_portrait %}
                         {% thumbnail user.frontpagecontent.head_portrait "340x340" crop="center" as im %}
-                        <img src="{{ im.url }}" width="{{ im.width }}" height="im.height">
+                        <img src="{{ im.url }}" width="{{ im.width }}" height="im.height" style="display: block;">
                         {% endthumbnail %}
                     {% else %}
-                        <img src="{% static 'img/default_head_portrait_big.jpeg' %}" width="340px" height="340px">
+                        <img src="{% static 'img/default_head_portrait_big.jpeg' %}" width="340px" height="340px" style="display: block;">
                     {% endif %}
                     {% get_user_head_portrait_form request user %}
                 </div>

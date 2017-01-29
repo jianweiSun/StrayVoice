@@ -130,6 +130,13 @@
 
     tableHoverEffect($('tbody>tr'));
 
+// active play-song button
+    $('tr.song-row').find('i.play-song').on('click', function(){
+        var song_id = $(this).closest('tr.song-row').data('id'),
+            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
+        ajaxSongPlay(url);
+    });
+
 // img preview
     var readURL = function(input) {
         if (input.files[0]) {
@@ -249,22 +256,6 @@
                 error: function(){ alert('錯誤') }
             });
         }
-    });
-
-// active play-song button
-    $('tr.song-row').find('i.play-song').on('click', function(){
-        var song_id = $(this).closest('tr.song-row').data('id'),
-            url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "html",
-            success : function(data){
-                $(data).prependTo($('ul#play-queue'))
-                       .find('i.queue-play-btn').trigger('click');
-            },
-            error: function(){ alert('錯誤') }
-        });
     });
 
 {% endblock %}
