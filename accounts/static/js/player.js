@@ -36,7 +36,7 @@ AudioPlayer.prototype.init = function(){
     // avoid race condition between pause() and play()
     setTimeout(function(){
         self.playQueue.find('li:first').find('i.queue-play-btn').trigger('click');
-    }, 150);
+    }, 300);
 }
 
 AudioPlayer.prototype.song_init = function($song_li){

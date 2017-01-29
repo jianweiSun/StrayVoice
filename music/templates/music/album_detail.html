@@ -138,58 +138,20 @@
     tableHoverEffect($('div[data-tag="songs"] tbody tr'));
     plusButtonToggleMenu();
     tagClickSet();
-    ajaxSongUtilsSet(false, 'tr.song-row', "{{ csrf_token }}");
+    ajaxSongUtilsSet(null, 'tr.song-row', "{{ csrf_token }}");
+    ajaxAlbumUtilsSet(album_id, null, "{{ csrf_token }}", 'album');
 
-// active play-song button
+// play-song button
     $('tr.song-row').find('i.play-song').on('click', function(){
         var song_id = $(this).closest('tr.song-row').data('id'),
             url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
         ajaxSongPlay(url);
     });
 
-// handle album-play-btn
+// album-play-btn
     $('i.album-play-btn').on('click', function(){
         var url = "{% url 'playqueue:album_exchange' "00000" %}".replace('00000', album_id);
         ajaxAlbumPlaylistPlay(url);
-    });
-
-// album-like-btn
-    $('i.album-like-btn').on('click', function(){
-        var $this = $(this),
-            like_num = parseInt($this.text()),
-            action = $this.hasClass('fa-heart-o') ? 'like': 'unlike';
-
-        $.ajax({
-            type: "POST",
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            url: "{% url 'music:album_like' %}",
-            data: {
-                'album_id': album_id,
-                'action': action,
-            },
-            success : function(data, string, xhr){
-                var content_type = xhr.getResponseHeader('Content-Type');
-                if (xhr.status == 278) {
-                    var url = xhr.getResponseHeader('Location'),
-                        pos = url.indexOf('?next='),
-                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
-                    $.get(redirect_url, function(data){
-                        dataAjaxLoad(data, redirect_url);
-                    })
-                }
-                else {
-                    if (action == 'like') {
-                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
-                                                       .text(' ' + (like_num+1));
-                    }
-                    else {
-                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
-                                                       .text(' ' + (like_num-1));
-                    }
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
     });
 
 // follow-btn
@@ -227,81 +189,5 @@
             },
             error: function(){ alert('錯誤') }
         });
-    });
-
-// album add queue
-    $('li.album-add-queue').on('click', function(){
-        var $this = $(this),
-            url = "{% url 'playqueue:album_append' '00000' %}".replace('00000', album_id);
-
-        $.ajax({
-            type: "GET",
-            'url': url,
-            dataType: "html",
-            success : function(data){
-                $(data).appendTo(audioplayer.playQueue);
-                $this.parent().css('visibility', 'hidden');
-                if (audioplayer.playQueue.find('li.active').length == 0) {
-                    audioplayer.playQueue.children().first()
-                                         .find('i.queue-play-btn').trigger('click');
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
-
-// album add playlist
-    $('li.album-add-playlist').on('click', function(e){
-        var $this = $(this),
-            $body = $('body'),
-            url = "{% url 'music:playlist_add' 'album' '00000' %}".replace('00000', album_id);
-
-        $this.parent().css('visibility', 'hidden');
-
-        $.ajax({
-            type: "GET",
-            'url': url,
-            success: function(data, string, xhr){
-                if (xhr.status == 278) {
-                    var url = xhr.getResponseHeader('Location'),
-                        pos = url.indexOf('?next='),
-                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
-                    $.get(redirect_url, function(data){
-                        dataAjaxLoad(data, redirect_url);
-                    })
-                }
-                else {
-                    $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
-                    $('<div></div>', { 'id': 'fixed-center' }).html(data).prependTo($body);
-                    popOutActivate();
-                }
-            },
-        });
-
-
-        function popOutActivate() {
-            var $popOutDiv = $('div#fixed-center'),
-                $popOutCover = $popOutDiv.next('#popout-black-cover'),
-                cancelButton = $popOutDiv.find('button[type=button]'),
-                form = $popOutDiv.find('form');
-
-            cancelButton.on('click', function(){
-                $popOutDiv.remove();
-                $popOutCover.remove();
-            });
-            form.on('submit', function(e){
-                $.ajax({
-                    type: "POST",
-                    'url': url,
-                    data: form.serialize(),
-                    success: function(data){
-                        $popOutDiv.remove();
-                        $popOutCover.remove();
-                    },
-                    error: function(){ alert('錯誤') }
-                });
-                e.preventDefault();
-            });
-        };
     });
 {% endblock %}

@@ -87,16 +87,16 @@
 {% block domready %}
 
     plusButtonToggleMenu();
-    ajaxSongUtilsSet(false, 'div.song-box', "{{ csrf_token }}");
+    ajaxSongUtilsSet(null, 'div.song-box', "{{ csrf_token }}");
 
-// handle song-play-btn
+// song-play-btn
     $('i.song-play-btn').on('click', function(){
         var song_id = $(this).closest('div.song-box').data('id'),
             url = "{% url 'playqueue:song_prepend' "00000" %}".replace('00000', song_id);
         ajaxSongPlay(url);
     });
 
-// handle songlist-play-btn
+// songlist-play-btn
     $('i.songlist-play-btn').on('click', function(){
         var tmp_array = new Array(),
             songs = $('div#songs-box').children('.song-box');

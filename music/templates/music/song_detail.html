@@ -105,7 +105,7 @@
 
     plusButtonToggleMenu();
     tagClickSet();
-    ajaxSongUtilsSet(song_id, false, "{{ csrf_token }}");
+    ajaxSongUtilsSet(song_id, null, "{{ csrf_token }}");
 
 // handle song-play-btn
     $('i.song-play-btn').on('click', function(){
