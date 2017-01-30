@@ -147,6 +147,7 @@
     tagClickSet();
     ajaxSongUtilsSet(null, 'tr.song-row', "{{ csrf_token }}");
     ajaxPlaylistUtilsSet(playlist_id, null, "{{ csrf_token }}", 'playlist');
+    ajaxFollowBtnSet($('button.follow-btn'), "{{ csrf_token }}");
 
 // play-song button
     $('tr.song-row').find('i.play-song').on('click', function(){
@@ -159,42 +160,5 @@
     $('i.playlist-play-btn').on('click', function(){
         var url = "{% url 'playqueue:playlist_exchange' "00000" %}".replace('00000', playlist_id);
         ajaxAlbumPlaylistPlay(url);
-    });
-
-// follow-btn
-    $('button.follow-btn').on('click', function(){
-        var $this = $(this),
-            username = $this.data('username'),
-            action = $this.hasClass('followed') ? 'unfollow' : 'follow' ;
-
-        $.ajax({
-            type: "POST",
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            url: "{% url 'user_follow' %}",
-            data: {
-                'username': username,
-                'action': action,
-            },
-            success : function(data, string, xhr){
-                var content_type = xhr.getResponseHeader('Content-Type');
-                if (xhr.status == 278) {
-                    var url = xhr.getResponseHeader('Location'),
-                        pos = url.indexOf('?next='),
-                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
-                    $.get(redirect_url, function(data){
-                        dataAjaxLoad(data, redirect_url);
-                    })
-                }
-                else {
-                    if (action == 'follow') {
-                        $this.addClass('followed').text('已追蹤');
-                    }
-                    else {
-                        $this.removeClass('followed').text('追蹤');
-                    }
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
     });
 {% endblock %}

@@ -182,11 +182,12 @@
 {% endblock %}
 <script id="main">
 
-    $(document).ready(function(){
+    (function(){
 
         {% block domready %}
         {% endblock %}
-    });
+
+    })();
 
 </script>
 </body>

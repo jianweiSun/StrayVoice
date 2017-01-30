@@ -63,14 +63,6 @@
     // do nothing if logout or href == '#'
         if ( !(href.slice(-1) == '#') ){
             e.preventDefault();
-        // create state obj for the first page( normal load without AJAX)
-            if (history.state == null){
-                history.replaceState(
-                    {'html':$container.html(), 'script': $script.html(), 'title': ori_title},
-                    ori_title,
-                    ori_url
-                )
-            }
 
             $.ajax({
                 type: "GET",
@@ -112,6 +104,8 @@
         }
 
         e.preventDefault();
+        // disable the submit button to prevent re-submit
+        $(this).find('button[type=submit]').prop('disabled',true);
 
         if (method == "post") {
             $.ajax({
@@ -140,7 +134,7 @@
                 'url': url,
                 data: $(this).serialize(),
                 success: function(data, string, xhr){
-                    dataAjaxLoad(data, url);
+                    dataAjaxLoad(data, this.url);
                 }
             });
         }

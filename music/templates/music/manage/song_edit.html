@@ -47,7 +47,7 @@
                 </ul>
         </div>
         <div>
-            <div id="song-info">
+            <div data-tag="song-info">
                 <div class="form-input">{{ form.name }}</div>
                 <div class="form-input">{{ form.description }}</div>
                 <div class="form-input-half">{{ form.album }}</div>
@@ -55,7 +55,7 @@
                 <div class="form-input-half">{{ form.authorization }}</div>
                 <div class="form-input-half">{{ form.published }}</div>
             </div>
-            <div id="lyrics" style="display: none">{{ form.lyrics }}</div>
+            <div data-tag="lyrics" style="display: none">{{ form.lyrics }}</div>
         </div>
         <p>
             <button type="submit">更新歌曲</button>
@@ -75,19 +75,6 @@
     tagClickSet();
 
 // img preview
-    var previewIMG = function(input) {
-        if (input.files[0]) {
-            var reader = new FileReader(),
-                file = input.files[0];
-
-            reader.readAsDataURL(file);
-
-            reader.onload = function() {
-                $('#img-preview').attr('src', reader.result);
-            }
-        }
-    };
-
     $('#id_cover').on('change', function(){
         previewIMG(this);
     });

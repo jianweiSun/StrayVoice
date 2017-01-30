@@ -76,6 +76,8 @@
 
 {% block domready %}
 
+    ajaxFollowBtnSet($('button.follow-btn'), "{{ csrf_token }}");
+
 // profile hover effect
     $('#profile').hover(function() {
         $(this).find('form').fadeIn(100);
@@ -88,41 +90,6 @@
         $(this).parents('form').submit();
     });
 
-// follow-btn
-    $('button.follow-btn').on('click', function(){
-        var $this = $(this),
-            username = $this.data('username'),
-            action = $this.hasClass('followed') ? 'unfollow' : 'follow' ;
-
-        $.ajax({
-            type: "POST",
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            url: "{% url 'user_follow' %}",
-            data: {
-                'username': username,
-                'action': action,
-            },
-            success : function(data, string, xhr){
-                if (xhr.status == 278) {
-                    var url = xhr.getResponseHeader('Location'),
-                        pos = url.indexOf('?next='),
-                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
-                    $.get(redirect_url, function(data){
-                        dataAjaxLoad(data, redirect_url);
-                    })
-                }
-                else {
-                    if (action == 'follow') {
-                        $this.addClass('followed').text('已追蹤');
-                    }
-                    else {
-                        $this.removeClass('followed').text('追蹤');
-                    }
-                }
-            },
-            error: function(){ alert('錯誤') }
-        });
-    });
     {% block section_script %}
     {% endblock %}
 {% endblock %}

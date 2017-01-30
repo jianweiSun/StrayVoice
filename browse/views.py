@@ -356,7 +356,7 @@ class SearchView(TemplateResponseMixin, View):
     def get(self, request):
         query_str = request.GET.get('q')
         if query_str:
-            songs = Song.objects.filter(name__icontains=query_str)
+            songs = Song.objects.filter(name__icontains=query_str, published=True)
         else:
             songs = None
         return self.render_to_response({'query_str': query_str,

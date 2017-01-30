@@ -28,6 +28,7 @@ class PlaylistCreateView(TemplateResponseMixin, LoginRequiredMixin, View):
     def post(self, request):
         form = PlaylistCreateForm(data=request.POST,
                                   files=request.FILES)
+        all_playlists = Playlist.objects.filter(user=request.user)
         if form.is_valid():
             playlist = form.save(commit=False)
             playlist.user = request.user
@@ -37,7 +38,8 @@ class PlaylistCreateView(TemplateResponseMixin, LoginRequiredMixin, View):
         else:
             messages.error(request, '歌單新增失敗')
         return self.render_to_response({'form': form,
-                                        'section': 'playlist_management'})
+                                        'section': 'playlist_management',
+                                        'all_playlists': all_playlists})
 
 
 class PlaylistEditView(TemplateResponseMixin, LoginRequiredMixin, View):

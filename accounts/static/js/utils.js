@@ -19,6 +19,11 @@ var popOutActivate = function(url){
         $popOutDiv.remove();
         $popOutCover.remove();
     });
+
+    $('a.btn').on('click', function(){
+        $popOutDiv.remove();
+        $popOutCover.remove();
+    })
     form.on('submit', function(e){
         $.ajax({
             type: "POST",
@@ -59,3 +64,17 @@ var tagClickSet = function(){
         e.preventDefault();
     });
 }
+
+// img preview
+var previewIMG = function(input) {
+    if (input.files[0]) {
+        var reader = new FileReader(),
+            file = input.files[0];
+
+        reader.readAsDataURL(file);
+
+        reader.onload = function() {
+            $('#img-preview').attr('src', reader.result);
+        }
+    }
+};

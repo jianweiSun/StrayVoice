@@ -58,7 +58,7 @@
                     </a>
                 </td>
                 <td>
-                    <a class="song-change-album btn" href="{% url 'music:song_change_album' song.id %}">
+                    <a class="song-change-album btn" href="#">
                         移至
                     </a>
                 </td>
@@ -89,9 +89,9 @@
         e.preventDefault();
         $('<div></div>', { 'id': 'popout-black-cover' }).prependTo($body);
         $('<div></div>', { 'id': 'fixed-center' })
-                        .load(url, popOutActivate).prependTo($body);
+                        .load(url, songChangeAlbumPopOutActivate).prependTo($body);
 
-        function popOutActivate() {
+        function songChangeAlbumPopOutActivate() {
             var $popOutDiv = $(this),
                 $popOutCover = $popOutDiv.next('#popout-black-cover'),
                 cancelButton = $popOutDiv.find('button[type=button]'),
@@ -101,14 +101,11 @@
                 $popOutDiv.remove();
                 $popOutCover.remove();
             });
-
             form.on('submit', function(e){
-                var data = form.serializeArray();
-
                 $.ajax({
                     type: "POST",
                     'url': url,
-                    data: data,
+                    data: form.serialize(),
                     success: function(data){
                         $popOutDiv.remove();
                         $popOutCover.remove();
@@ -125,4 +122,5 @@
             });
         };
     });
+
 {% endblock %}

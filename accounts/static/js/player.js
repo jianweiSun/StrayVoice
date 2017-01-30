@@ -369,19 +369,14 @@ AudioPlayer.prototype.likeButtonSet = function() {
                     })
                 }
                 else {
-                    if ($li.hasClass('active') || $li.parent().is('#playing-data-wrapper')) {
-                        var $btn_on_playing = self.container.find('ul#playing-data-wrapper i.queue-like-btn'),
-                            $btn_on_queue = $active = self.playQueue.find('li.active i.queue-like-btn');
-
-                        $this = $btn_on_playing.add($btn_on_queue);
-                    }
-
+                    var song_id = $li.data('id'),
+                        $like_btns = self.container.find('li[data-id=' +song_id + '] i.queue-like-btn');
                     if (action == 'like') {
-                        $this.removeClass('fa-heart-o').addClass('fa-heart red')
+                        $like_btns.removeClass('fa-heart-o').addClass('fa-heart red')
                                                        .text(' ' + (like_num+1));
                     }
                     else {
-                        $this.removeClass('fa-heart red').addClass('fa-heart-o')
+                        $like_btns.removeClass('fa-heart red').addClass('fa-heart-o')
                                                        .text(' ' + (like_num-1));
                     }
                 }

@@ -11,6 +11,13 @@ var dataAjaxLoad = function(data, href){
         $log_btn = $data_div.find('div#nav li#log-btn'),
         $ul_dropdown = $data_div.find('ul.dropdown-menu');
 
+// replaceState so that update the dynamic content, ex: like btn, follow btn
+    history.replaceState(
+        {'html':$container.html(), 'script': $script_container.html(), 'title': document.title},
+        document.title,
+        document.location.href
+    )
+
     $container.html($content.html());
     $script_container.html($script.html());
     $token_container.html($token.html());
@@ -19,14 +26,15 @@ var dataAjaxLoad = function(data, href){
     $('div#nav li#log-btn').html($log_btn.html());
     $('ul.dropdown-menu').html($ul_dropdown.html());
 
-    eval($token.html());
-    eval($script.html());
 //  exclude log_btn to behave properly while login/logout
     history.pushState(
         {'html':$container.html(), 'script': $script.html(), 'title': $title.text()},
         $title.text(),
         href
     )
+
+    eval($token.html());
+    eval($script.html());
 };
 
 var ajaxSongPlay = function(url){
@@ -144,7 +152,7 @@ var ajaxSongUtilsSet = function(song_id, selector, csrf_token){
     });
 }
 
-// id is binded on selector
+// data-id bind on selector
 var ajaxAlbumUtilsSet = function(album_id, selector, csrf_token, prefix){
 // album-like-btn
     $('i.'+ prefix +'-like-btn').on('click', function(){
@@ -326,6 +334,44 @@ var ajaxPlaylistUtilsSet = function(playlist_id, selector, csrf_token, prefix){
                     popOutActivate(urlMusicPlaylistAdd('playlist', id));
                 }
             },
+        });
+    });
+}
+// data-username bind on $btn
+var ajaxFollowBtnSet = function($btn, csrf_token){
+    $btn.on('click', function(){
+        var $this = $(this),
+            username = $this.data('username'),
+            action = $this.hasClass('followed') ? 'unfollow' : 'follow' ;
+
+        $.ajax({
+            type: "POST",
+            headers: {'X-CSRFToken': csrf_token},
+            url: urlUserFollow,
+            data: {
+                'username': username,
+                'action': action,
+            },
+            success : function(data, string, xhr){
+                var content_type = xhr.getResponseHeader('Content-Type');
+                if (xhr.status == 278) {
+                    var url = xhr.getResponseHeader('Location'),
+                        pos = url.indexOf('?next='),
+                        redirect_url = url.slice(0, pos+6) + window.location.pathname;
+                    $.get(redirect_url, function(data){
+                        dataAjaxLoad(data, redirect_url);
+                    })
+                }
+                else {
+                    if (action == 'follow') {
+                        $this.addClass('followed').text('已追蹤');
+                    }
+                    else {
+                        $this.removeClass('followed').text('追蹤');
+                    }
+                }
+            },
+            error: function(){ alert('錯誤') }
         });
     });
 }

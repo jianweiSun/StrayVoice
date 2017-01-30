@@ -76,7 +76,7 @@ class AlbumEditView(TemplateResponseMixin, LoginRequiredMixin, View):
             form.save()
             messages.success(request, '專輯編輯成功')
         else:
-            messages.success(request, '專輯編輯失敗')
+            messages.error(request, '專輯編輯失敗')
         return self.render_to_response({'form': form,
                                         'album': self.album,
                                         'songs': self.songs,
@@ -146,6 +146,7 @@ class UnAlbumSongsEditView(TemplateResponseMixin, LoginRequiredMixin, View):
                                         'section': 'music_management'})
 
 
+@method_decorator(ajax_required, name='dispatch')
 class SongChangeAlbumView(TemplateResponseMixin, LoginRequiredMixin, View):
     template_name = 'music/manage/song_change_album.html'
 
@@ -185,7 +186,8 @@ class AlbumCoverApplySongsView(LoginRequiredMixin, View):
         album_id = request.POST.get('album_id')
         album = get_object_or_404(Album, user=request.user, id=album_id)
         album_cover = album.cover
-        album.songs.update(cover=album_cover)
+        if album_cover:
+            album.songs.update(cover=album_cover)
         return redirect(reverse('music:album_edit', args=[album_id]))
 
 
