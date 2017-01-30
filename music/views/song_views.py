@@ -125,7 +125,8 @@ class SongLikeView(LoginRequiredMixin, View):
 
         song = get_object_or_404(Song, id=song_id)
         if action == 'like':
-            SongLikeShip.objects.create(user=request.user, song=song)
+            # prevent the error caused by user double like
+            SongLikeShip.objects.get_or_create(user=request.user, song=song)
             song.total_likes = song.liked_by.count()
             song.save()
         else:
