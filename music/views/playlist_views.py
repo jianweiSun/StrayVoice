@@ -214,7 +214,8 @@ class PlaylistLikeView(LoginRequiredMixin, View):
         playlist = get_object_or_404(Playlist, id=playlist_id)
 
         if action == 'like':
-            PlaylistLikeShip.objects.create(user=request.user, playlist=playlist)
+            # prevent the error caused by user double like
+            PlaylistLikeShip.objects.get_or_create(user=request.user, playlist=playlist)
             playlist.total_likes = playlist.liked_by.count()
             playlist.save()
         else:

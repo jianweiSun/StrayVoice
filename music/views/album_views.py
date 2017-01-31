@@ -214,7 +214,8 @@ class AlbumLikeView(LoginRequiredMixin, View):
             return HttpResponseNotFound()
 
         if action == 'like':
-            AlbumLikeShip.objects.create(user=request.user, album=album)
+            # prevent the error caused by user double like
+            AlbumLikeShip.objects.get_or_create(user=request.user, album=album)
             album.total_likes = album.liked_by.count()
             album.save()
         else:
