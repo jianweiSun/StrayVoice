@@ -61,7 +61,7 @@
             ori_url = document.location.href;
 
     // do nothing if logout or href == '#'
-        if ( !(href.slice(-1) == '#') ){
+        if ( !(href.slice(-1) == '#') && !$(this).hasClass('no_ajax')){
             e.preventDefault();
 
             $.ajax({
