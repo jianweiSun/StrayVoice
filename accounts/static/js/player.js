@@ -31,12 +31,9 @@ AudioPlayer.prototype.init = function(){
 	this.queueCloseButtonSet();
 	this.queueClearButtonSet();
 	this.likeButtonSet();
-	// trigger the first song
-    this.playQueue.find('li:first').find('i.queue-play-btn').trigger('click');
-    // avoid race condition between pause() and play()
-    setTimeout(function(){
-        self.playQueue.find('li:first').find('i.queue-play-btn').trigger('click');
-    }, 300);
+	// initial the first song
+    this.playQueue.find('li:first').find('i.queue-play-btn').trigger('click')
+                                                            .trigger('click');
 }
 
 AudioPlayer.prototype.song_init = function($song_li){
