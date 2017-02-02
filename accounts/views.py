@@ -178,7 +178,7 @@ class UserFollowView(LoginRequiredMixin, View):
             return HttpResponseBadRequest()
 
         if action == 'follow':
-            FollowShip.objects.create(profile_from=profile, profile_to=profile_to)
+            FollowShip.objects.get_or_create(profile_from=profile, profile_to=profile_to)
             profile_to.total_followers = profile_to.followers.count()
             profile_to.save()
         else:
